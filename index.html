@@ -462,7 +462,7 @@ footer{background:#07101a;padding:2.8rem 5vw 6.5rem 5vw;display:flex;align-items
   const db = getDatabase(app);
 window.firebaseDB=db;
 window.firebaseRef=ref;
-window.firebaseSet=set;
+window.firebaseSet=set;window.firebaseGet=get;
   const checklistRef = ref(db, 'viagem/checklist');
 
   // Variável para travar cliques duplos durante a sincronização inicial
@@ -891,6 +891,72 @@ document.addEventListener('DOMContentLoaded',()=>{
       e.stopPropagation();
     });
   });
+
+});
+</script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+
+function collectEditableData(){
+  const data = {};
+  document.querySelectorAll('[contenteditable="true"]').forEach((el,i)=>{
+    if(!el.dataset.firebaseKey){
+      el.dataset.firebaseKey = 'editable_' + i;
+    }
+    data[el.dataset.firebaseKey] = el.innerHTML;
+  });
+  return data;
+}
+
+const saveBtn = Array.from(document.querySelectorAll('button'))
+  .find(b => b.textContent && b.textContent.includes('Salvar'));
+
+if(saveBtn){
+  saveBtn.addEventListener('click', async ()=>{
+    try{
+      const data = collectEditableData();
+
+      if(window.firebaseDB && window.firebaseRef && window.firebaseSet){
+        await window.firebaseSet(
+          window.firebaseRef(window.firebaseDB, 'sharedContent'),
+          data
+        );
+        console.log('Saved to Firebase');
+      }else{
+        console.warn('Firebase globals not found');
+      }
+    }catch(err){
+      console.error(err);
+    }
+  });
+}
+
+async function loadSharedContent(){
+  try{
+    if(window.firebaseDB && window.firebaseRef && window.firebaseGet){
+      const snap = await window.firebaseGet(
+        window.firebaseRef(window.firebaseDB, 'sharedContent')
+      );
+
+      if(snap.exists()){
+        const data = snap.val();
+        document.querySelectorAll('[contenteditable="true"]').forEach((el,i)=>{
+          const key = 'editable_' + i;
+          el.dataset.firebaseKey = key;
+          if(data[key] !== undefined){
+            el.innerHTML = data[key];
+          }
+        });
+      }
+    }
+  }catch(err){
+    console.error(err);
+  }
+}
+
+loadSharedContent();
 
 });
 </script>
