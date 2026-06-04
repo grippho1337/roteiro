@@ -169,8 +169,8 @@ section{padding:5rem 0}
 /* ─── CHECKLIST ─────────────────────────────── */
 #checklist{background:var(--paper2)}
 .cl-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:1.2rem}
-.cl-group{background:var(--white);border:1px solid var(--border);padding:1.6rem}
-.cl-head{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:600;color:var(--navy);margin-bottom:1.1rem;padding-bottom:.8rem;border-bottom:1px solid var(--paper2);display:flex;align-items:center;gap:.6rem}
+.cl-group{background:var(--white);border:1px solid var(--border);padding:1.6rem;position:relative}
+.cl-head{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:600;color:var(--navy);margin-bottom:1.1rem;padding-bottom:.8rem;border-bottom:1px solid var(--paper2);display:flex;align-items:center;gap:.6rem;padding-right:30px}
 .cl-ico{font-size:1.1rem}
 .cl-list{list-style:none;display:flex;flex-direction:column;gap:1px}
 .cl-item{
@@ -181,10 +181,80 @@ section{padding:5rem 0}
 .cl-item input[type=checkbox]{accent-color:var(--navy);width:14px;height:14px;flex-shrink:0;margin-top:2px;cursor:pointer}
 .cl-txt{font-size:.73rem;color:#444;line-height:1.5;flex:1}
 .cl-item.done .cl-txt{text-decoration:line-through;color:var(--muted)}
-.bdg{display:inline-block;font-size:.55rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.1rem .45rem;border-radius:2px;margin-left:.4rem;vertical-align:middle}
+.bdg{display:inline-block;font-size:.55rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.1rem .45rem;border-radius:2px;margin-left:.4rem;vertical-align:middle;flex-shrink:0}
 .bw{background:#fef3c7;color:#92400e}
 .bo{background:#dbeafe;color:#1e40af}
 .bg{background:#d1fae5;color:#065f46}
+
+/* Botão de + nos cards do checklist */
+.btn-card-edit {
+  position:absolute;top:1.4rem;right:1.4rem;
+  width:24px;height:24px;background:rgba(184,146,74,0.1);
+  color:var(--gold);border-radius:50%;font-size:0.9rem;font-weight:600;
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.2s ease;cursor:pointer;
+}
+.btn-card-edit:hover {
+  background:var(--gold);color:var(--white);
+  transform:scale(1.08);
+}
+
+/* ─── MODAL DE MODIFICAÇÕES (POP-UP) ────────── */
+.modal-overlay {
+  position:fixed;inset:0;background:rgba(14,14,14,0.6);
+  backdrop-filter:blur(4px);z-index:2000;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity 0.3s ease;
+}
+.modal-overlay.open { opacity:1;pointer-events:auto; }
+.modal-box {
+  background:var(--white);border:1px solid var(--border);
+  width:90%;max-width:500px;padding:2rem;position:relative;
+  box-shadow:0 12px 40px rgba(0,0,0,0.15);
+}
+.modal-close {
+  position:absolute;top:1rem;right:1rem;
+  font-size:1.5rem;color:var(--muted);cursor:pointer;transition:color 0.2s;
+}
+.modal-close:hover { color:var(--rust); }
+.modal-ttl { font-family:'Cormorant Garamond',serif;font-size:1.6rem;color:var(--navy);margin-bottom:1.5rem;border-bottom:1px solid var(--paper2);padding-bottom:0.5rem; }
+
+.modal-items-list { list-style:none;max-height:220px;overflow-y:auto;margin-bottom:1.5rem;padding-right:5px; }
+.modal-items-list::-webkit-scrollbar { width:4px; }
+.modal-items-list::-webkit-scrollbar-thumb { background:var(--border); }
+.modal-row {
+  display:flex;align-items:center;justify-content:between;gap:0.6rem;
+  padding:0.5rem 0;border-bottom:1px solid rgba(0,0,0,0.04);
+}
+.modal-row-txt { font-size:0.75rem;color:var(--ink);flex:1; }
+.btn-row-del {
+  color:var(--rust);font-size:0.65rem;text-transform:uppercase;
+  letter-spacing:0.05em;font-weight:600;padding:0.2rem 0.5rem;
+  border:1px solid rgba(139,58,42,0.15);transition:all 0.2s;
+}
+.btn-row-del:hover { background:rgba(139,58,42,0.08);border-color:var(--rust); }
+
+.modal-form { display:flex;gap:0.4rem;margin-bottom:1.5rem;align-items:center; }
+.modal-input {
+  flex:1;background:var(--paper);border:1px solid var(--border);
+  padding:0.5rem 0.8rem;font-size:0.75rem;color:var(--ink);font-family:inherit;
+}
+.modal-input:focus { outline:1px solid var(--gold); }
+.modal-select {
+  background:var(--paper);border:1px solid var(--border);font-family:inherit;
+  padding:0.48rem;font-size:0.7rem;color:var(--navy);
+}
+.btn-modal-add {
+  background:var(--navy);color:var(--white);padding:0.5rem 1rem;
+  font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;font-weight:500;
+}
+.btn-modal-add:hover { background:var(--navy2); }
+.btn-modal-save {
+  background:var(--gold);color:var(--navy);width:100%;padding:0.8rem;
+  font-size:0.75rem;text-transform:uppercase;letter-spacing:0.15em;font-weight:600;
+  text-align:center;box-shadow:0 3px 10px rgba(184,146,74,0.15);
+}
+.btn-modal-save:hover { background:var(--gold2); }
 
 /* ─── TIPS ──────────────────────────────────── */
 #dicas{background:var(--ink2);padding:5rem 0}
@@ -194,7 +264,7 @@ section{padding:5rem 0}
 .tip-card:hover{background:rgba(255,255,255,.04)}
 .tip-ico{font-size:1.5rem;margin-bottom:1rem}
 .tip-ttl{font-size:.72rem;font-weight:600;color:var(--gold);letter-spacing:.12em;text-transform:uppercase;margin-bottom:.9rem}
-.tip-ul holiday-list{list-style:none;display:flex;flex-direction:column;gap:.55rem}
+.tip-ul{list-style:none;display:flex;flex-direction:column;gap:.55rem}
 .tip-ul li{font-size:.72rem;color:rgba(255,255,255,.45);display:flex;align-items:flex-start;gap:.6rem;line-height:1.55}
 .td2{width:4px;height:4px;background:var(--gold);border-radius:50%;flex-shrink:0;margin-top:.45rem;opacity:.5}
 
@@ -288,7 +358,7 @@ footer{background:#07101a;padding:2.8rem 5vw 6.5rem 5vw;display:flex;align-items
   <div class="hero-content">
     <div class="hero-eyebrow">Roteiro de viagem · 3 pessoas · Setembro–Outubro 2026</div>
     <h1 class="hero-title">Europa<br><em>2026</em></h1>
-    <p class="hero-sub">Portugal &nbsp;·&nbsp; Itália &nbsp;·&nbsp; Espanha</p>
+    <p class="hero-sub">Portugal  ·  Itália  ·  Espanha</p>
     <div class="hero-chips">
       <span class="chip">24 Set — 18 Out</span>
       <span class="chip">25 dias</span>
@@ -335,6 +405,7 @@ footer{background:#07101a;padding:2.8rem 5vw 6.5rem 5vw;display:flex;align-items
   <div class="s-eye fi"><span class="s-label">Roteiro dia a dia</span></div>
   <h2 class="s-title fi">Cada dia planejado,<br><em>cada memória garantida.</em></h2>
 
+  <!-- BASE LOGÍSTICA DE TRANSTALÂNTICO -->
   <div class="country-block fi">
     <div class="country-head">
       <span class="country-flag">🇧🇷✈️</span>
@@ -345,40 +416,520 @@ footer{background:#07101a;padding:2.8rem 5vw 6.5rem 5vw;display:flex;align-items
         <div class="day-date"><div class="day-wd">Qui</div><div class="day-n">24</div><div class="day-mo">Set</div></div>
         <div class="day-body">
           <div class="day-top">
-            <div><div class="day-t">Campo Grande → São Paulo + Passeio</div><div class="day-loc">CGR → GRU · MASP · Ibirapuera · Voo meia-noite</div></div>
+            <div><div class="day-t">Campo Grande → São Paulo → Madrid</div><div class="day-loc">Conexões em CGR e GRU · Tour na Avenida Paulista</div></div>
             <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
           </div>
           <div class="day-tags"><span class="tag th">Voo 05:20 CGR→GRU ✓</span><span class="tag th">Voo 00:30 GRU→MAD ✓</span><span class="tag td">MASP</span><span class="tag td">Ibirapuera</span></div>
           <div class="day-detail"><div class="sched">
-            <div class="si"><span class="si-t">05:20</span><div class="si-a"><strong>Voo CGR → GRU</strong><small>Chegada ~08:10</small></div></div>
-            <div class="si"><span class="si-t">24:30</span><div class="si-a"><strong>✈️ Voo GRU → Madrid</strong><small>Chegada local dia 25 às 19:10</small></div></div>
+            <div class="si"><span class="si-t">05:20</span><div class="si-a"><strong>Voo Campo Grande → São Paulo (GRU)</strong><small>Chegada prevista para ~08:10 no terminal principal.</small></div></div>
+            <div class="si"><span class="si-t">09:00</span><div class="si-a"><strong>Metrô GRU → Paulista</strong><small>Linha 13 + Baldeações rápidas. Adquira o bilhete unitário diretamente na bilheteria física.</small></div></div>
+            <div class="si"><span class="si-t">09:30</span><div class="si-a"><strong>MASP — Museu de Arte de São Paulo</strong><small>Parada icônica com foco na passarela arquitetônica livre.</small></div></div>
+            <div class="si"><span class="si-t">10:00</span><div class="si-a"><strong>Caminhada e Café na Av. Paulista</strong><small>Dicas de paradas recomendadas: Padaria Santa Luzia ou Café Suplicy.</small></div></div>
+            <div class="si"><span class="si-t">11:30</span><div class="si-a"><strong>Deslocamento para o Ibirapuera</strong><small>Trajeto via Metrô Consolação → Ana Rosa + 20 min de caminhada até o portão principal.</small></div></div>
+            <div class="si"><span class="si-t">12:00</span><div class="si-a"><strong>Parque Ibirapuera</strong><small>Ponto de almoço flexível com food trucks variados e descanso na grama.</small></div></div>
+            <div class="si"><span class="si-t">13:30</span><div class="si-a"><strong>Via Palazzo ou Centro Histórico</strong><small>Extensão histórica opcional direcionada à icônica Praça da Sé se quiser um roteiro mais cultural.</small></div></div>
+            <div class="si"><span class="si-t">15:30</span><div class="si-a"><strong>Retorno Estratégico para GRU</strong><small>Linha 13 do trem expresso. Saia sempre com 2h ou mais de antecedência preventiva.</small></div></div>
+            <div class="si"><span class="si-t">16:30</span><div class="si-a"><strong>Preparação Interna no Aeroporto</strong><small>Banho + jantar tranquilo no Terminal 3 (área internacional).</small></div></div>
+            <div class="si"><span class="si-t">00:30</span><div class="si-a"><strong>✈️ Voo Intercontinental SP → Madrid</strong><small>Embarque noturno transatlântico rumo à Espanha.</small></div></div>
+          </div></div>
+        </div>
+      </div>
+
+      <div class="day-card" onclick="tog(this)">
+        <div class="day-date"><div class="day-wd">Sex</div><div class="day-n">25</div><div class="day-mo">Set</div></div>
+        <div class="day-body">
+          <div class="day-top">
+            <div><div class="day-t">Chegada em Madrid</div><div class="day-loc">Pouso em Barajas (MAD) · Instalação e Adaptação</div></div>
+            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="day-tags"><span class="tag th">Desembarque 19:10</span><span class="tag td">Check-in Airbnb</span><span class="tag tw">Fuso +5h</span></div>
+          <div class="day-detail"><div class="sched">
+            <div class="si"><span class="si-t">19:10</span><div class="si-a"><strong>Chegada ao Aeroporto Madrid-Barajas (MAD)</strong><small>Desembarque internacional no Terminal T4.</small></div></div>
+            <div class="si"><span class="si-t">19:40</span><div class="si-a"><strong>Metrô Aeroporto → Centro</strong><small>Conexão via Linha 8 rumo a Sol/Ópera. Custo aproximado de €5 incluindo suplemento.</small></div></div>
+            <div class="si"><span class="si-t">20:30</span><div class="si-a"><strong>Check-in Airbnb em Madrid</strong><small>Endereço: Calle de Doña Leonor de Cortina, 9. Anfitrião: Raul.</small></div></div>
+            <div class="si"><span class="si-t">21:30</span><div class="si-a"><strong>Jantar Leve no Bairro</strong><small>Exploração das tabernas residenciais tranquilas nos arredores.</small></div></div>
+            <div class="si"><span class="si-t">22:30</span><div class="si-a"><strong>Descanso & Ajuste de Fuso</strong><small>Hora de dormir cedo e sincronizar o relógio biológico (+5h).</small></div></div>
           </div></div>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- PORTUGAL BASE COM SETÚBAL E EVENTO -->
   <div class="country-block fi">
     <div class="country-head">
       <span class="country-flag">🇵🇹</span>
-      <div><div class="country-nm">Portugal</div><div class="country-cities">Lisboa · Sintra</div></div>
+      <div><div class="country-nm">Portugal</div><div class="country-cities">Lisboa · Sintra · Setúbal</div></div>
     </div>
     <div class="timeline">
       <div class="day-card" onclick="tog(this)">
         <div class="day-date"><div class="day-wd">Sáb</div><div class="day-n">26</div><div class="day-mo">Set</div></div>
         <div class="day-body">
           <div class="day-top">
-            <div><div class="day-t">Madrid → Lisboa · Instalação em Setúbal</div><div class="day-loc">Voo 06:30 MAD→LIS</div></div>
+            <div><div class="day-t">Madrid → Lisboa · Base em Setúbal</div><div class="day-loc">Voo AirEuropa UX1159 · Instalação</div></div>
             <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
           </div>
-          <div class="day-tags"><span class="tag th">Voo MAD→LIS 06:30 ✓</span><span class="tag td">Setúbal</span></div>
+          <div class="day-tags"><span class="tag th">Reserva: 9EQ69U</span><span class="tag td">Uber para Setúbal</span><span class="tag tw">Peixe Grelhado</span></div>
           <div class="day-detail"><div class="sched">
-            <div class="si"><span class="si-t">06:30</span><div class="si-a"><strong>✈️ Voo MAD→LIS</strong></div></div>
+            <div class="si"><span class="si-t">04:30</span><div class="si-a"><strong>Despertar e Deslocamento para o T4</strong><small>Trânsito de táxi ou aplicativo até Barajas. Agende previamente.</small></div></div>
+            <div class="si"><span class="si-t">06:00</span><div class="si-a"><strong>Check-in e Embarque</strong><small>Voo UX1159 — Código local da reserva: 9EQ69U.</small></div></div>
+            <div class="si"><span class="si-t">06:30</span><div class="si-a"><strong>✈️ Voo Madrid → Lisboa</strong><small>Pouso previsto às 06:50 no Terminal 1 de Lisboa (LIS).</small></div></div>
+            <div class="si"><span class="si-t">07:30</span><div class="si-a"><strong>Transfer Terrestre até Setúbal</strong><small>Trajeto de carro por aplicativo direto (~1h). Destino: Av. 22 de Dezembro, 46.</small></div></div>
+            <div class="si"><span class="si-t">09:00</span><div class="si-a"><strong>Chegada ao Airbnb de Setúbal</strong><small>Guarda preliminar de malas com o anfitrião Artem (Check-in oficial 16h).</small></div></div>
+            <div class="si"><span class="si-t">10:30</span><div class="si-a"><strong>Passeio Inicial de Reconhecimento</strong><small>Café matinal local nas imediações costeiras.</small></div></div>
+            <div class="si"><span class="si-t">13:00</span><div class="si-a"><strong>Almoço Tradicional Marítimo</strong><small>Degustação do famoso peixe grelhado tradicional de Setúbal.</small></div></div>
+            <div class="si"><span class="si-t">15:00</span><div class="si-a"><strong>Descanso no Airbnb</strong><small>Parada estratégica essencial para recuperar o desgaste físico do tráfego aéreo.</small></div></div>
+          </div></div>
+        </div>
+      </div>
+
+      <div class="day-card" onclick="tog(this)">
+        <div class="day-date"><div class="day-wd">Dom</div><div class="day-n">27</div><div class="day-mo">Set</div></div>
+        <div class="day-body">
+          <div class="day-top">
+            <div><div class="day-t">Lisboa — Sintra (Bate-volta Clássico)</div><div class="day-loc">Castelo dos Mouros · Palácio da Pena · Alfama</div></div>
+            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="day-tags"><span class="tag th">Trem Lisboa Oriente</span><span class="tag td">Palácio da Pena</span><span class="tag tw">Pôr do Sol na Graça</span></div>
+          <div class="day-detail"><div class="sched">
+            <div class="si"><span class="si-t">08:00</span><div class="si-a"><strong>Partida de Trem para Sintra</strong><small>Embarque na estação Lisboa Oriente. Valor médio de €4,60 ida/volta.</small></div></div>
+            <div class="si"><span class="si-t">09:30</span><div class="si-a"><strong>Chegada em Sintra e Ingressos</strong><small>Dica: Compre o bilhete integrado online (Mouros + Pena) por cerca de €14.</small></div></div>
+            <div class="si"><span class="si-t">10:00</span><div class="si-a"><strong>Castelo dos Mouros</strong><small>Exploração das muralhas defensivas medievais com vista panorâmica.</small></div></div>
+            <div class="si"><span class="si-t">11:30</span><div class="si-a"><strong>Palácio da Pena</strong><small>Visita minuciosa aos salões internos e jardins. Reserva de horário online obrigatória.</small></div></div>
+            <div class="si"><span class="si-t">13:30</span><div class="si-a"><strong>Almoço e Doces Típicos</strong><small>Parada gastronômica na Piriquita para provar os icônicos "Travesseiros de Sintra".</small></div></div>
+            <div class="si"><span class="si-t">14:30</span><div class="si-a"><strong>Vila de Sintra e Centro Histórico</strong><small>Caminhada livre e fotos da fachada monumental do Palácio Nacional.</small></div></div>
+            <div class="si"><span class="si-t">16:00</span><div class="si-a"><strong>Retorno de Trem a Lisboa</strong><small>Deslocamento ferroviário de volta à capital com desembarque por volta das 17h.</small></div></div>
+            <div class="si"><span class="si-t">17:30</span><div class="si-a"><strong>Bairro Tradicional de Alfama</strong><small>Caminhada pelas vielas medievais com pôr do sol no Miradouro da Graça.</small></div></div>
+            <div class="si"><span class="si-t">19:30</span><div class="si-a"><strong>Jantar Temático de Bacalhau</strong><small>Indicações típicas: Solar dos Presuntos ou Tasca do Chico.</small></div></div>
+          </div></div>
+        </div>
+      </div>
+
+      <!-- BLOCO COMPACTO DO EVENTO OFICIAL -->
+      <div class="day-card" onclick="tog(this)">
+        <div class="day-date"><div class="day-wd">Seg</div><div class="day-n">28</div><div class="day-mo">Set</div></div>
+        <div class="day-body">
+          <div class="day-top">
+            <div><div class="day-t">Lisboa — Início do Evento Principal (Dia 1)</div><div class="day-loc">Programação oficial durante o dia · Atividades livres ao final da tarde</div></div>
+            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="day-tags"><span class="tag th">Evento Oficial</span><span class="tag td">Torre de Belém</span><span class="tag td">Jerónimos</span></div>
+          <div class="day-detail"><div class="sched">
+            <div class="si"><span class="si-t">Dia</span><div class="si-a"><strong>Participação no Cronograma do Evento</strong><small>Dedicação às palestras e atividades institucionais matutinas e vespertinas.</small></div></div>
+            <div class="si"><span class="si-t">Noite</span><div class="si-a"><strong>Passeio na Torre de Belém & Jerónimos</strong><small>Deslocamento via Metrô + Bonde 15E saindo da zona central.</small></div></div>
+          </div></div>
+        </div>
+      </div>
+
+      <div class="day-card" onclick="tog(this)">
+        <div class="day-date"><div class="day-wd">Ter</div><div class="day-n">29</div><div class="day-mo">Set</div></div>
+        <div class="day-body">
+          <div class="day-top">
+            <div><div class="day-t">Lisboa — Evento Principal (Dia 2)</div><div class="day-loc">Programação oficial durante o dia · Circuito LX Factory no pós-evento</div></div>
+            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="day-tags"><span class="tag th">Evento Oficial</span><span class="tag td">LX Factory</span><span class="tag tw">Arte & Design</span></div>
+          <div class="day-detail"><div class="sched">
+            <div class="si"><span class="si-t">Dia</span><div class="si-a"><strong>Participação no Cronograma do Evento</strong><small>Compromissos corporativos ou acadêmicos fixados.</small></div></div>
+            <div class="si"><span class="si-t">Noite</span><div class="si-a"><strong>Exploração da LX Factory</strong><small>Distrito industrial reconvertido em lojas de design, galerias e hubs gastronômicos.</small></div></div>
+          </div></div>
+        </div>
+      </div>
+
+      <div class="day-card" onclick="tog(this)">
+        <div class="day-date"><div class="day-wd">Qua</div><div class="day-n">30</div><div class="day-mo">Set</div></div>
+        <div class="day-body">
+          <div class="day-top">
+            <div><div class="day-t">Lisboa — Evento Principal (Dia 3)</div><div class="day-loc">Programação oficial durante o dia · Rota cultural no Museu do Azulejo</div></div>
+            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="day-tags"><span class="tag th">Evento Oficial</span><span class="tag td">Museu do Azulejo</span></div>
+          <div class="day-detail"><div class="sched">
+            <div class="si"><span class="si-t">Dia</span><div class="si-a"><strong>Participação no Cronograma do Evento</strong><small>Atividades regulares do evento principal.</small></div></div>
+            <div class="si"><span class="si-t">Noite</span><div class="si-a"><strong>Museu Nacional do Azulejo</strong><small>Visita à imponente igreja antiga integrada que hoje sedia o museu nacional.</small></div></div>
+          </div></div>
+        </div>
+      </div>
+
+      <div class="day-card" onclick="tog(this)">
+        <div class="day-date"><div class="day-wd">Qui</div><div class="day-n">01</div><div class="day-mo">Out</div></div>
+        <div class="day-body">
+          <div class="day-top">
+            <div><div class="day-t">Lisboa — Evento Principal (Dia 4)</div><div class="day-loc">Programação oficial durante o dia · Escapada de Ferry até a Praia de Tróia</div></div>
+            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="day-tags"><span class="tag th">Evento Oficial</span><span class="tag td">Ferry Setúbal</span><span class="tag td">Praia de Tróia</span></div>
+          <div class="day-detail"><div class="sched">
+            <div class="si"><span class="si-t">Dia</span><div class="si-a"><strong>Participação no Cronograma do Evento</strong><small>Aulas, painéis ou reuniões agendadas no evento.</small></div></div>
+            <div class="si"><span class="si-t">Noite</span><div class="si-a"><strong>Travessia e Praia de Tróia</strong><small>Embarque no catamarã/ferry em Setúbal (30 min de trajeto, saídas de hora em hora por ~€6).</small></div></div>
+          </div></div>
+        </div>
+      </div>
+
+      <div class="day-card" onclick="tog(this)">
+        <div class="day-date"><div class="day-wd">Sex</div><div class="day-n">02</div><div class="day-mo">Out</div></div>
+        <div class="day-body">
+          <div class="day-top">
+            <div><div class="day-t">Lisboa — Evento Principal (Dia 5)</div><div class="day-loc">Programação oficial durante o dia · Caminhada costeira em Cascais</div></div>
+            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="day-tags"><span class="tag th">Evento Oficial</span><span class="tag td">Trem para Cascais</span><span class="tag tw">Vila Costeira</span></div>
+          <div class="day-detail"><div class="sched">
+            <div class="si"><span class="si-t">Dia</span><div class="si-a"><strong>Participação no Cronograma do Evento</strong><small>Penúltimo dia de imersão na agenda principal.</small></div></div>
+            <div class="si"><span class="si-t">Noite</span><div class="si-a"><strong>Passeio de Fim de Tarde em Cascais</strong><small>Acesso direto via trem rápido na linha de Cascais (40 min de viagem costeira panorâmica).</small></div></div>
+          </div></div>
+        </div>
+      </div>
+
+      <div class="day-card" onclick="tog(this)">
+        <div class="day-date"><div class="day-wd">Sáb</div><div class="day-n">03</div><div class="day-mo">Out</div></div>
+        <div class="day-body">
+          <div class="day-top">
+            <div><div class="day-t">Lisboa — Encerramento do Evento (Dia 6)</div><div class="day-loc">Fim do cronograma oficial · Noite boêmia no Chiado e Bairro Alto</div></div>
+            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="day-tags"><span class="tag th">Fim do Evento</span><span class="tag td">Bairro Alto</span><span class="tag td">Livraria Bertrand</span></div>
+          <div class="day-detail"><div class="sched">
+            <div class="si"><span class="si-t">Dia</span><div class="si-a"><strong>Sessões Finais e Fechamento</strong><small>Finalização da grade de compromissos do evento europeu.</small></div></div>
+            <div class="si"><span class="si-t">Noite</span><div class="si-a"><strong>Vida Noturna: Bairro Alto e Chiado</strong><small>Casas de fado históricas e passagem pela secular Livraria Bertrand (fundada em 1732).</small></div></div>
           </div></div>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- ITÁLIA: VENEZA, FLORENÇA E ROMA -->
+  <div class="country-block fi">
+    <div class="country-head">
+      <span class="country-flag">🇮🇹</span>
+      <div><div class="country-nm">Itália</div><div class="country-cities">Veneza · Florença · Roma</div></div>
+    </div>
+    <div class="timeline">
+      <div class="day-card" onclick="tog(this)">
+        <div class="day-date"><div class="day-wd">Dom</div><div class="day-n">04</div><div class="day-mo">Out</div></div>
+        <div class="day-body">
+          <div class="day-top">
+            <div><div class="day-t">Lisboa → Veneza</div><div class="day-loc">Voo Direto Marco Polo (VCE) · Rota de Vaporetto e San Marco</div></div>
+            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="day-tags"><span class="tag th">Voo 06:45 LIS→VCE</span><span class="tag td">Vaporetto</span><span class="tag tw">San Marco & Rialto</span></div>
+          <div class="day-detail"><div class="sched">
+            <div class="si"><span class="si-t">05:00</span><div class="si-a"><strong>Despertar e Corrida ao Aeroporto LIS</strong><small>Deslocamento terrestre por aplicativo partindo de Setúbal (~1h).</small></div></div>
+            <div class="si"><span class="si-t">06:45</span><div class="si-a"><strong>✈️ Voo Lisboa → Veneza</strong><small>Companhia aérea regular (TAP / Ryanair). Pouso previsto às 10:45 no Aeroporto Marco Polo.</small></div></div>
+            <div class="si"><span class="si-t">11:30</span><div class="si-a"><strong>Logística de Hidrotransporte Alilaguna</strong><small>Embarque no Vaporetto clássico (Linha 1 ou Alilaguna) até o centro histórico (~75 min, €15).</small></div></div>
+            <div class="si"><span class="si-t">12:30</span><div class="si-a"><strong>Check-in em Veneza</strong><small>Acomodação imediata das malas para saída limpa às ruas.</small></div></div>
+            <div class="si"><span class="si-t">13:00</span><div class="si-a"><strong>Almoço em um Bacaro Típico</strong><small>Tabernas de vinho venezianas. Evite as imediações da San Marco devido a superfaturamento.</small></div></div>
+            <div class="si"><span class="si-t">14:30</span><div class="si-a"><strong>Praça San Marco & Basílica</strong><small>Entrada franca nos mosaicos internos. Priorize acesso até 15h para mitigar filas.</small></div></div>
+            <div class="si"><span class="si-t">15:30</span><div class="si-a"><strong>Subida ao Campanile de San Marco</strong><small>Mirante com ângulo 360° da laguna veneziana (€10).</small></div></div>
+            <div class="si"><span class="si-t">16:30</span><div class="si-a"><strong>Caminhada sem Rumo em Cannaregio</strong><small>Exploração das pontes residenciais tranquilas no "Lado B" de Veneza.</small></div></div>
+            <div class="si"><span class="si-t">18:00</span><div class="si-a"><strong>Ponte de Rialto no Crepúsculo</strong><small>Ponto perfeito para registrar o pôr do sol clássico no Grande Canal.</small></div></div>
+            <div class="si"><span class="si-t">20:00</span><div class="si-a"><strong>Jantar de Cicchetti Venezianos</strong><small>Tapas locais tradicionais. Dicas: All'Arco ou Osteria Boccadoro.</small></div></div>
+          </div></div>
+        </div>
+      </div>
+
+      <div class="day-card" onclick="tog(this)">
+        <div class="day-date"><div class="day-wd">Seg</div><div class="day-n">05</div><div class="day-mo">Out</div></div>
+        <div class="day-body">
+          <div class="day-top">
+            <div><div class="day-t">Veneza (Murano & Burano) → Florença</div><div class="day-loc">Ilhas Coloridas · Trem de Alta Velocidade Frecciarossa</div></div>
+            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="day-tags"><span class="tag th">Trem 16:26 S. Lucia ✓</span><span class="tag td">Burano</span><span class="tag tw">Mercato Centrale</span></div>
+          <div class="day-detail"><div class="sched">
+            <div class="si"><span class="si-t">Nota</span><div class="si-a"><strong>Aviso Importante de Segunda-Feira</strong><small>Segunda é o dia oficial de fechamento de museus e mercados na Itália. Planeje com antecedência.</small></div></div>
+            <div class="si"><span class="si-t">08:00</span><div class="si-a"><strong>Café da Manhã Veneziano</strong><small>Consumo rápido de balcão em uma pasticceria residencial periférica.</small></div></div>
+            <div class="si"><span class="si-t">09:00</span><div class="si-a"><strong>Ilha de Murano (Vidro Soprado)</strong><small>Acesso rápido de vaporetto (~€2,50). Fábricas tradicionais com demonstração grátis.</small></div></div>
+            <div class="si"><span class="si-t">10:30</span><div class="si-a"><strong>Ilha de Burano</strong><small>Cenários fotográficos mundiais com as fachadas multicoloridas (40 min de barco partindo de Murano).</small></div></div>
+            <div class="si"><span class="si-t">13:00</span><div class="si-a"><strong>Almoço à Beira-Mar em Burano</strong><small>Frutos do mar locais. Indicação: Trattoria da Romano.</small></div></div>
+            <div class="si"><span class="si-t">14:30</span><div class="si-a"><strong>Retorno a San Polo</strong><small>Circuito de despedida pelas pontes do distrito comercial central.</small></div></div>
+            <div class="si"><span class="si-t">16:26</span><div class="si-a"><strong>Trem de Alta Velocidade para Florença</strong><small>Embarque na estação Venezia Santa Lucia. Viagem direta de ~2h10m (€55).</small></div></div>
+            <div class="si"><span class="si-t">18:40</span><div class="si-a"><strong>Desembarque em Firenze SMN</strong><small>Estação central de Florença. Cidade compacta: deslocamentos a pé ou por ônibus urbano.</small></div></div>
+            <div class="si"><span class="si-t">19:00</span><div class="si-a"><strong>Check-in Airbnb em Florença</strong><small>Instalação do grupo no endereço toscano.</small></div></div>
+            <div class="si"><span class="si-t">20:00</span><div class="si-a"><strong>Jantar Coberto no Mercato Centrale</strong><small>Piso superior gastronômico variado com longa abertura noturna.</small></div></div>
+          </div></div>
+        </div>
+      </div>
+
+      <div class="day-card" onclick="tog(this)">
+        <div class="day-date"><div class="day-wd">Ter</div><div class="day-n">06</div><div class="day-mo">Out</div></div>
+        <div class="day-body">
+          <div class="day-top">
+            <div><div class="day-t">Florença Renascentista (Dia Completo)</div><div class="day-loc">Duomo · Galeria Uffizi · Pôr do sol na Piazzale Michelangelo</div></div>
+            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="day-tags"><span class="tag th">Galleria Uffizi €25 ✓</span><span class="tag td">Duomo</span><span class="tag tw">Piazzale Michelangelo</span></div>
+          <div class="day-detail"><div class="sched">
+            <div class="si"><span class="si-t">08:30</span><div class="si-a"><strong>Duomo de Florença (Santa Maria del Fiore)</strong><small>Exterior aberto gratuito. Subida na Cúpula de Brunelleschi (€30 com agendamento).</small></div></div>
+            <div class="si"><span class="si-t">09:30</span><div class="si-a"><strong>Campanile di Giotto</strong><small>Desafio físico de 414 degraus para obter a melhor vista da cúpula vizinha (€18).</small></div></div>
+            <div class="si"><span class="si-t">10:30</span><div class="si-a"><strong>Piazza della Signoria & Loggia</strong><small>Galeria artística renascentista ao ar livre com réplicas do David e o Perseu de Cellini.</small></div></div>
+            <div class="si"><span class="si-t">12:00</span><div class="si-a"><strong>Almoço Rápido no Nerbone</strong><small>Lanche de Lampredotto ou Trippa tradicional no coração do Mercato.</small></div></div>
+            <div class="si"><span class="si-t">13:30</span><div class="si-a"><strong>Galleria degli Uffizi</strong><small>Ingressos obrigatórios antecipados (€25). Lar de obras primas de Botticelli e Da Vinci.</small></div></div>
+            <div class="si"><span class="si-t">16:30</span><div class="si-a"><strong>Travessia na Ponte Vecchio</strong><small>Registro das tradicionais joalherias seculares suspensas sobre o Rio Arno.</small></div></div>
+            <div class="si"><span class="si-t">17:30</span><div class="si-a"><strong>Subida à Piazzale Michelangelo</strong><small>Caminhada de 15 minutos rumo ao mirante de pôr do sol mais famoso da Itália.</small></div></div>
+            <div class="si"><span class="si-t">19:30</span><div class="si-a"><strong>Jantar no Distrito do Oltrarno</strong><small>Opções gastronômicas tradicionais locais: Buca Mario ou Buca dell'Orafo.</small></div></div>
+          </div></div>
+        </div>
+      </div>
+
+      <div class="day-card" onclick="tog(this)">
+        <div class="day-date"><div class="day-wd">Qua</div><div class="day-n">07</div><div class="day-mo">Out</div></div>
+        <div class="day-body">
+          <div class="day-top">
+            <div><div class="day-t">Florença → Roma (Deslocamento à Tarde)</div><div class="day-loc">Galleria dell'Accademia (Davi) · Trem rápido para Roma Termini</div></div>
+            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="day-tags"><span class="tag th">Accademia €20 ✓</span><span class="tag th">Trem 15:40 ✓</span><span class="tag td">Casa Tio Pepe</span></div>
+          <div class="day-detail"><div class="sched">
+            <div class="si"><span class="si-t">09:00</span><div class="si-a"><strong>Galleria dell'Accademia</strong><small>Contemplação agendada do David original de Michelangelo (€20).</small></div></div>
+            <div class="si"><span class="si-t">11:00</span><div class="si-a"><strong>Compras Gastronômicas na Toscana</strong><small>Parada de lembranças: queijos trufados, embutidos artesanais e azeites no mercado.</small></div></div>
+            <div class="si"><span class="si-t">12:00</span><div class="si-a"><strong>Almoço de Despedida Florença</strong><small>Caminhada pelas imediações calmas da Basílica de Santa Croce.</small></div></div>
+            <div class="si"><span class="si-t">15:00</span><div class="si-a"><strong>Retirada de Malas na Estação SMN</strong><small>Passagem pelo guarda-volumes da ferrovia para embarque.</small></div></div>
+            <div class="si"><span class="si-t">15:40</span><div class="si-a"><strong>Trem Florença → Roma Termini</strong><small>Viagem de alta velocidade operada pela Trenitalia/Italo de 1h30m (~€25).</small></div></div>
+            <div class="si"><span class="si-t">17:15</span><div class="si-a"><strong>Chegada na Estação Roma Termini</strong><small>Desembarque central com conexões imediatas às linhas metroviárias A e B.</small></div></div>
+            <div class="si"><span class="si-t">18:00</span><div class="si-a"><strong>Check-in na Casa do Tio Pepe</strong><small>Acomodação oficial da família na capital, descanso rápido e descanse.</small></div></div>
+            <div class="si"><span class="si-t">20:00</span><div class="si-a"><strong>Noite Boêmia no Trastevere</strong><small>Primeiro contato gastronômico e exploração do bairro histórico vibrante.</small></div></div>
+          </div></div>
+        </div>
+      </div>
+
+      <div class="day-card" onclick="tog(this)">
+        <div class="day-date"><div class="day-wd">Qui</div><div class="day-n">08</div><div class="day-mo">Out</div></div>
+        <div class="day-body">
+          <div class="day-top">
+            <div><div class="day-t">Roma — Os Tesouros do Vaticano</div><div class="day-loc">Museus do Vaticano · Capela Sistina · Basílica de São Pedro</div></div>
+            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="day-tags"><span class="tag th">Vaticano €20 ✓</span><span class="tag td">Capela Sistina</span><span class="tag tw">Gelateria dei Gracchi</span></div>
+          <div class="day-detail"><div class="sched">
+            <div class="si"><span class="si-t">08:00</span><div class="si-a"><strong>Chegada à Cidade do Vaticano</strong><small>Acesso antecipado obrigatório. Filas físicas monumentais na entrada comum.</small></div></div>
+            <div class="si"><span class="si-t">08:30</span><div class="si-a"><strong>Tour nos Museus do Vaticano</strong><small>Passagem detalhada pelas Galerias dos Mapas e dos Tapetes (€20).</small></div></div>
+            <div class="si"><span class="si-t">10:00</span><div class="si-a"><strong>Capela Sistina</strong><small>Contemplação silenciosa dos afrescos de Michelangelo. Proibido registros de fotos.</small></div></div>
+            <div class="si"><span class="si-t">11:30</span><div class="si-a"><strong>Basílica de São Pedro</strong><small>Acesso monumental interno livre. Subida opcional à Cúpula (€6 escadas / €8 elevador).</small></div></div>
+            <div class="si"><span class="si-t">13:00</span><div class="si-a"><strong>Almoço no Distrito de Prati</strong><small>Refeição residencial com parada doce recomendada na Gelateria dei Gracchi.</small></div></div>
+            <div class="si"><span class="si-t">14:30</span><div class="si-a"><strong>Castel Sant'Angelo</strong><small>Fortaleza papal medieval com ampla passarela fotográfica do Rio Tibre (€15).</small></div></div>
+            <div class="si"><span class="si-t">16:30</span><div class="si-a"><strong>Passeio na Villa Borghese</strong><small>Caminhada de descanso pelos jardins arborizados da Piazza del Popolo.</small></div></div>
+            <div class="si"><span class="si-t">18:30</span><div class="si-a"><strong>Pôr do Sol no Terraço do Pincio</strong><small>Ângulo clássico e panorâmico da capital aberto ao público.</small></div></div>
+            <div class="si"><span class="si-t">20:00</span><div class="si-a"><strong>Jantar Carbonara no Da Enzo al 29</strong><small>Famosa parada romana clássica no Trastevere (essencial agendamento prévio).</small></div></div>
+          </div></div>
+        </div>
+      </div>
+
+      <div class="day-card" onclick="tog(this)">
+        <div class="day-date"><div class="day-wd">Sex</div><div class="day-n">09</div><div class="day-mo">Out</div></div>
+        <div class="day-body">
+          <div class="day-top">
+            <div><div class="day-t">Roma — Centro Histórico e Antiguidade</div><div class="day-loc">Coliseu · Fórum Romano · Fontana di Trevi · Panteão</div></div>
+            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="day-tags"><span class="tag th">Coliseu ~18€ ✓</span><span class="tag th">Galleria Borghese €25 ✓</span><span class="tag td">Fontana di Trevi</span></div>
+          <div class="day-detail"><div class="sched">
+            <div class="si"><span class="si-t">08:00</span><div class="si-a"><strong>Chegada à Estação Colosseo</strong><small>Desembarque metroviário imediato na boca do monumento imperial.</small></div></div>
+            <div class="si"><span class="si-t">08:30</span><div class="si-a"><strong>Tour Interno Coliseu, Fórum & Palatino</strong><small>Ingresso unificado obrigatório online para os sítios antigos (~€18).</small></div></div>
+            <div class="si"><span class="si-t">12:00</span><div class="si-a"><strong>Almoço no Campo de' Fiori</strong><small>Praça tradicional com mercados livres e ótimas mesas na calçada.</small></div></div>
+            <div class="si"><span class="si-t">13:30</span><div class="si-a"><strong>Panteão de Roma</strong><small>Joia da engenharia romana com abertura zenital. Agendamento prévio indicado.</small></div></div>
+            <div class="si"><span class="si-t">14:30</span><div class="si-a"><strong>Ritual da Moeda na Fontana di Trevi</strong><small>Janela matutina/vespertina estratégica com circulação flutuante reduzida.</small></div></div>
+            <div class="si"><span class="si-t">15:30</span><div class="si-a"><strong>Piazza Navona</strong><small>Apreciação barroca com destaque direto à Fontana dei Quattro Fiumi de Bernini.</small></div></div>
+            <div class="si"><span class="si-t">17:00</span><div class="si-a"><strong>Galleria Borghese</strong><small>Visita agendada rígida para ver o Rapto de Proserpina (€25). Controle de público estrito.</small></div></div>
+            <div class="si"><span class="si-t">19:30</span><div class="si-a"><strong>Aperitivo Tradicional no Pigneto</strong><small>Bairro residencial alternativo afastado das tarifas turísticas centrais.</small></div></div>
+          </div></div>
+        </div>
+      </div>
+
+      <div class="day-card" onclick="tog(this)">
+        <div class="day-date"><div class="day-wd">Sáb</div><div class="day-n">10</div><div class="day-mo">Out</div></div>
+        <div class="day-body">
+          <div class="day-top">
+            <div><div class="day-t">Bate-volta Imperial: Roma → Pompeia → Roma</div><div class="day-loc">Ruínas Arqueológicas e Almoço de Pizza Tradicional em Nápoles</div></div>
+            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="day-tags"><span class="tag th">Frecciarossa ✓</span><span class="tag td">Ruínas Pompeia €16</span><span class="tag tw">Pizza Napolitana</span></div>
+          <div class="day-detail"><div class="sched">
+            <div class="si"><span class="si-t">07:00</span><div class="si-a"><strong>Trem de Alta Velocidade Roma → Nápoles</strong><small>Embarque Frecciarossa na Termini (~1h10m, tarifas de €20 a €30).</small></div></div>
+            <div class="si"><span class="si-t">08:15</span><div class="si-a"><strong>Conexão em Napoli Centrale</strong><small>Desembarque central e migração rápida para os trilhos regionais inferiores.</small></div></div>
+            <div class="si"><span class="si-t">08:30</span><div class="si-a"><strong>Trem Circumvesuviana para as Ruínas</strong><small>Embarque ferroviário local direto até a parada Pompeia Scavi (€2,80, 35 min).</small></div></div>
+            <div class="si"><span class="si-t">09:30</span><div class="si-a"><strong>Sítio Arqueológico de Pompeia</strong><small>Entrada: €16. Crucial: Chapéu e garrafa de água. Poucas coberturas de sombra.</small></div></div>
+            <div class="si"><span class="si-t">Rota</span><div class="si-a"><strong>Circuito Prioritário Interno (~4h)</strong><small>Foco nos eixos capitais: Foro Central, Lupanare, Casa del Fauno e Teatro Grande.</small></div></div>
+            <div class="si"><span class="si-t">13:30</span><div class="si-a"><strong>Almoço de Autêntica Pizza Napolitana</strong><small>Retorno à Nápoles via Circumvesuviana. Paradas lendárias: Sorbillo ou Da Michele.</small></div></div>
+            <div class="si"><span class="si-t">15:00</span><div class="si-a"><strong>Caminhada Expressa em Spaccanapoli</strong><small>Imersão urbana rústica e vibrante pelas vielas históricas napolitanas.</small></div></div>
+            <div class="si"><span class="si-t">16:30</span><div class="si-a"><strong>Trem Frecciarossa Nápoles → Roma</strong><small>Retorno ferroviário confortável de 1h10m com destino à capital.</small></div></div>
+            <div class="si"><span class="si-t">18:30</span><div class="si-a"><strong>Chegada e Descanso em Termini</strong><small>Retorno ao Airbnb da Casa do Tio Pepe para ceia leve residencial.</small></div></div>
+          </div></div>
+        </div>
+      </div>
+
+      <div class="day-card" onclick="tog(this)">
+        <div class="day-date"><div class="day-wd">Dom</div><div class="day-n">11</div><div class="day-mo">Out</div></div>
+        <div class="day-body">
+          <div class="day-top">
+            <div><div class="day-t">Roma — Bênção Papal e Aventino</div><div class="day-loc">Praça São Pedro (Ângelus) · Jardim das Laranjeiras · Testaccio</div></div>
+            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="day-tags"><span class="tag th">Bênção do Ângelus ✓</span><span class="tag td">Buraco da Fechadura</span><span class="tag tw">Mercato Testaccio</span></div>
+          <div class="day-detail"><div class="sched">
+            <div class="si"><span class="si-t">09:00</span><div class="si-a"><strong>Manhã Dominical na Praça São Pedro</strong><small>Presença para Missa ou preparação de segurança na esplanada papal.</small></div></div>
+            <div class="si"><span class="si-t">10:30</span><div class="si-a"><strong>Bênção do Ângelus</strong><small>Aparição pontual do Papa Francisco na janela do palácio pontifício ao meio-dia.</small></div></div>
+            <div class="si"><span class="si-t">12:30</span><div class="si-a"><strong>Almoço e Parada no Bar San Calisto</strong><small>O Trastevere se enche de músicos e famílias aos domingos. Parada boêmia clássica.</small></div></div>
+            <div class="si"><span class="si-t">14:00</span><div class="si-a"><strong>Colina do Aventino & Jardim das Laranjeiras</strong><small>Caminhada tranquila. Ao lado de Santa Sabina, veja o famoso Buraco da Fechadura de Malta.</small></div></div>
+            <div class="si"><span class="si-t">16:00</span><div class="si-a"><strong>Gastronomia local no Mercato Testaccio</strong><small>Mercado coberto perfeito para degustar queijos e vinhos em taça com moradores locais.</small></div></div>
+            <div class="si"><span class="si-t">18:00</span><div class="si-a"><strong>Piazza Venezia ao Anoitecer</strong><small>O imponente monumento Vittoriano iluminado gera um dos cenários noturnos mais belos.</small></div></div>
+            <div class="si"><span class="si-t">20:00</span><div class="si-a"><strong>Jantar de Despedida da Itália</strong><small>Reserva especial na Enoteca Il Sorì para vinhos nobres e frios refinados.</small></div></div>
+          </div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ESPANHA: BARCELONA E RETORNO POR MADRID -->
+  <div class="country-block fi">
+    <div class="country-head">
+      <span class="country-flag">🇪🇸</span>
+      <div><div class="country-nm">Espanha</div><div class="country-cities">Barcelona · Madrid</div></div>
+    </div>
+    <div class="timeline">
+      <div class="day-card" onclick="tog(this)">
+        <div class="day-date"><div class="day-wd">Seg</div><div class="day-n">12</div><div class="day-mo">Out</div></div>
+        <div class="day-body">
+          <div class="day-top">
+            <div><div class="day-t">Roma → Barcelona</div><div class="day-loc">Voo Ryanair de FCO · Las Ramblas · Bairro Gótico</div></div>
+            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="day-tags"><span class="tag th">Voo Roma→BCN €26-101</span><span class="tag td">La Boqueria</span><span class="tag tw">Bar Barceloneta</span></div>
+          <div class="day-detail"><div class="sched">
+            <div class="si"><span class="si-t">06:00</span><div class="si-a"><strong>Ida para o Aeroporto Fiumicino (FCO)</strong><small>Embarque no trem expresso direto Leonardo Express saindo da Termini (€14, 32 min).</small></div></div>
+            <div class="si"><span class="si-t">07:00</span><div class="si-a"><strong>Embarque Aeroporto FCO</strong><small>Procedimentos low-cost da Ryanair. Franquia padrão de mala inclusa.</small></div></div>
+            <div class="si"><span class="si-t">08:25</span><div class="si-a"><strong>✈️ Voo Roma → Barcelona</strong><small>Duração média de 2h30m. Pouso previsto às ~10:55 no Aeroporto El Prat.</small></div></div>
+            <div class="si"><span class="si-t">11:30</span><div class="si-a"><strong>Transfer Aeroporto → Centro BCN</strong><small>Ônibus executivo rápido Aerobus (€7,25) ou trem comum suburbano (€5,15).</small></div></div>
+            <div class="si"><span class="si-t">12:30</span><div class="si-a"><strong>Check-in Airbnb em Barcelona</strong><small>Entrada e acomodação do grupo em solo catalão.</small></div></div>
+            <div class="si"><span class="si-t">13:30</span><div class="si-a"><strong>Almoço no Mercado La Boqueria</strong><small>Instalado no eixo central das Ramblas. Excelente horário para balcões vazios.</small></div></div>
+            <div class="si"><span class="si-t">15:00</span><div class="si-a"><strong>Exploração do Bairro Gótico</strong><small>Caminhada pelas ruelas medievais, Catedral Histórica e fotos na Pont del Bisbe.</small></div></div>
+            <div class="si"><span class="si-t">17:00</span><div class="si-a"><strong>Distrito Hype de El Born</strong><small>Região charmosa de boutiques. Visite a imponente Basílica de Santa Maria do Mar.</small></div></div>
+            <div class="si"><span class="si-t">19:00</span><div class="si-a"><strong>Orla Costeira de Barceloneta</strong><small>Caminhada descontraída pelo calçadão de praia com vista direta ao Mar Mediterrâneo.</small></div></div>
+            <div class="si"><span class="si-t">21:00</span><div class="si-a"><strong>Jantar de Autênticas Tapas Catalãs</strong><small>Referências locais famosas: Bar Cañete ou El Xampanyet.</small></div></div>
+          </div></div>
+        </div>
+      </div>
+
+      <div class="day-card" onclick="tog(this)">
+        <div class="day-date"><div class="day-wd">Ter</div><div class="day-n">13</div><div class="day-mo">Out</div></div>
+        <div class="day-body">
+          <div class="day-top">
+            <div><div class="day-t">Barcelona — Gaudí e a Rota Modernista</div><div class="day-loc">Sagrada Família · Casa Milà · Casa Batlló · Palau de la Música</div></div>
+            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="day-tags"><span class="tag th">Sagrada Família €26-36 ✓</span><span class="tag td">Casa Batlló €35</span><span class="tag tw">Mercado Santa Caterina</span></div>
+          <div class="day-detail"><div class="sched">
+            <div class="si"><span class="si-t">09:00</span><div class="si-a"><strong>Basílica da Sagrada Família</strong><small>RESERVA ONLINE COM MESES DE ANTECEDÊNCIA. Acesso simples €26 / Com Torres €36.</small></div></div>
+            <div class="si"><span class="si-t">11:00</span><div class="si-a"><strong>Casa Milà (La Pedrera)</strong><small>Contemplação da icônica fachada ondulada e terraço de Gaudí (€28).</small></div></div>
+            <div class="si"><span class="si-t">13:00</span><div class="si-a"><strong>Almoço Dinâmico no Eixample</strong><small>Balcões rápidos de alto padrão na famosa Cervecería Catalana.</small></div></div>
+            <div class="si"><span class="si-t">14:30</span><div class="si-a"><strong>Casa Batlló</strong><small>Obra prima residencial orgânica de Antoni Gaudí com tour interativo digital (€35).</small></div></div>
+            <div class="si"><span class="si-t">16:30</span><div class="si-a"><strong>Passeig de Gràcia & Manzana de la Discórdia</strong><small>Boulevard nobre cercado por edifícios assinados por arquitetos modernistas rivais.</small></div></div>
+            <div class="si"><span class="si-t">18:00</span><div class="si-a"><strong>Palau de la Música Catalana</strong><small>Fachada deslumbrante modernista protegida como Patrimônio da Humanidade UNESCO.</small></div></div>
+            <div class="si"><span class="si-t">20:00</span><div class="si-a"><strong>Jantar no Mercado de Santa Caterina</strong><small>Excelente e elegante alternativa menos saturada de turismo que a Boqueria.</small></div></div>
+          </div></div>
+        </div>
+      </div>
+
+      <div class="day-card" onclick="tog(this)">
+        <div class="day-date"><div class="day-wd">Qua</div><div class="day-n">14</div><div class="day-mo">Out</div></div>
+        <div class="day-body">
+          <div class="day-top">
+            <div><div class="day-t">Barcelona — Montserrat + Park Güell</div><div class="day-loc">Mosteiro na Montanha Sagrada · Mirante Bunkers del Carmel</div></div>
+            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="day-tags"><span class="tag th">Passe Combo €29,35 ✓</span><span class="tag td">Park Güell €15 ✓</span><span class="tag tw">Bunkers del Carmel</span></div>
+          <div class="day-detail"><div class="sched">
+            <div class="si"><span class="si-t">08:30</span><div class="si-a"><strong>Bate-volta Ferroviário para Montserrat</strong><small>Saída da Plaça Espanya via FGC. Bilhete integrado (Trem + Cremalheira ida/volta) €29,35.</small></div></div>
+            <div class="si"><span class="si-t">10:00</span><div class="si-a"><strong>Santuário de Montserrat</strong><small>Visita à Moreneta (Virgem Negra padroeira). Chegar cedo mitiga grandes grupos.</small></div></div>
+            <div class="si"><span class="si-t">10:45</span><div class="si-a"><strong>Funicular de Sant Joan</strong><small>Subida ao cume com trilhas leves e panoramas que alcançam os Pireneus.</small></div></div>
+            <div class="si"><span class="si-t">13:30</span><div class="si-a"><strong>Retorno de Trem a Barcelona</strong><small>Trajeto de 1h30m de volta para almoço urbano tardio por volta das 15h.</small></div></div>
+            <div class="si"><span class="si-t">15:30</span><div class="si-a"><strong>Park Güell (Zona Monumental)</strong><small>Visita aos mosaicos e colunas onduladas. Compra online prévia obrigatória (€15).</small></div></div>
+            <div class="si"><span class="si-t">17:30</span><div class="si-a"><strong>Crepúsculo nos Bunkers del Carmel</strong><small>Antiga base de defesa militar com o ângulo livre 360° mais espetacular de Barcelona.</small></div></div>
+            <div class="si"><span class="si-t">20:00</span><div class="si-a"><strong>Jantar de Encerramento em Barcelona</strong><small>Balcão clássico no Quimet & Quimet ou absinto histórico no Bar Marsella.</small></div></div>
+          </div></div>
+        </div>
+      </div>
+
+      <div class="day-card" onclick="tog(this)">
+        <div class="day-date"><div class="day-wd">Qui</div><div class="day-n">15</div><div class="day-mo">Out</div></div>
+        <div class="day-body">
+          <div class="day-top">
+            <div><div class="day-t">Barcelona → Madrid (Trem de Alta Velocidade)</div><div class="day-loc">Estação de Sants → Atocha · Parque do Retiro · Show de Flamenco</div></div>
+            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="day-tags"><span class="tag th">Trem AVE €50-80 ✓</span><span class="tag td">Parque do Retiro</span><span class="tag tw">Flamenco ~50€</span></div>
+          <div class="day-detail"><div class="sched">
+            <div class="si"><span class="si-t">08:00</span><div class="si-a"><strong>Café da Manhã de Despedida</strong><small>Consumo rápido de Pa amb tomàquet (pão com tomate) tradicional.</small></div></div>
+            <div class="si"><span class="si-t">09:30</span><div class="si-a"><strong>Trem AVE Barcelona Sants → Madrid Atocha</strong><small>Trajeto direto veloz cortando o país em 2h30m (Custo médio de €50 a €80).</small></div></div>
+            <div class="si"><span class="si-t">12:00</span><div class="si-a"><strong>Chegada na Estação de Atocha</strong><small>Dedique minutos para apreciar o jardim tropical úmido integrado no saguão histórico.</small></div></div>
+            <div class="si"><span class="si-t">12:30</span><div class="si-a"><strong>Check-in Airbnb em Madrid</strong><small>Última hospedagem da Eurotrip.</small></div></div>
+            <div class="si"><span class="si-t">13:00</span><div class="si-a"><strong>Almoço no Mercado de la Cebada</strong><small>Indicações locais de tapas no bairro residencial boêmio de La Latina.</small></div></div>
+            <div class="si"><span class="si-t">14:30</span><div class="si-a"><strong>Caminhada no Parque do Retiro</strong><small>Visita ao Palácio de Cristal, Roseiras e o Grande Lago central.</small></div></div>
+            <div class="si"><span class="si-t">16:00</span><div class="si-a"><strong>Tarde Alternativa em Malasaña ou Chueca</strong><small>Bairros vanguardistas repletos de brechós, livrarias independentes e arte urbana.</small></div></div>
+            <div class="si"><span class="si-t">18:00</span><div class="si-a"><strong>Caminhada Noturna na Gran Vía</strong><small>Apreciação dos neons urbanos e fachadas icônicas como o Edifício Metrópolis.</small></div></div>
+            <div class="si"><span class="si-t">20:00</span><div class="si-a"><strong>Show de Flamenco ao Vivo em um Tablao</strong><small>Experiência musical artística profunda. Indicações: Corral de la Morería ou Torres Bermejas (~€50).</small></div></div>
+          </div></div>
+        </div>
+      </div>
+
+      <div class="day-card" onclick="tog(this)">
+        <div class="day-date"><div class="day-wd">Sex</div><div class="day-n">16</div><div class="day-mo">Out</div></div>
+        <div class="day-body">
+          <div class="day-top">
+            <div><div class="day-t">Madrid — Museus Nobres e Centro Histórico</div><div class="day-loc">Museu do Prado · Reina Sofía · Palácio Real · Templo de Debod</div></div>
+            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="day-tags"><span class="tag th">Museu do Prado €15 ✓</span><span class="tag th">Reina Sofía €12 ✓</span><span class="tag tw">Sobrino de Botín</span></div>
+          <div class="day-detail"><div class="sched">
+            <div class="si"><span class="si-t">09:00</span><div class="si-a"><strong>Museu do Prado</strong><small>Uma das maiores pinacotecas mundiais. Indispensável ver "Las Meninas" de Velázquez (€15).</small></div></div>
+            <div class="si"><span class="si-t">12:00</span><div class="si-a"><strong>Museu Nacional Centro de Arte Reina Sofía</strong><small>Parada vizinha para contemplar a imensidão do painel anti-guerra "Guernica" de Picasso (€12).</small></div></div>
+            <div class="si"><span class="si-t">13:30</span><div class="si-a"><strong>Tapas Gourmet no Mercado de San Miguel</strong><small>Estrutura histórica de ferro convertida em bancas conceituais de alta gastronomia.</small></div></div>
+            <div class="si"><span class="si-t">15:00</span><div class="si-a"><strong>Plaza Mayor</strong><small>Grande praça monumental inaugurada em 1617, perfeita para fotos nas arcadas seculares.</small></div></div>
+            <div class="si"><span class="si-t">15:45</span><div class="si-a"><strong>Palácio Real de Madrid & Jardins</strong><small>Caminhada externa livre pelos Jardins de Sabatini. Acesso aos salões internos €14.</small></div></div>
+            <div class="si"><span class="si-t">17:30</span><div class="si-a"><strong>Crepúsculo no Templo de Debod</strong><small>Templo egípcio original com mais de 2.200 anos montado em Madrid. Pôr do sol clássico.</small></div></div>
+            <div class="si"><span class="si-t">19:00</span><div class="si-a"><strong>Rota de "Tapas y Cañas" em Lavapiés</strong><small>Circuito boêmio para se misturar às dinâmicas de fim de semana dos madrilenhos.</small></div></div>
+            <div class="si"><span class="si-t">20:30</span><div class="si-a"><strong>Jantar Oficial de Despedida no Sobrino de Botín</strong><small>O restaurante ativo mais antigo do mundo certificado pelo Guinness Book. Reserve antes.</small></div></div>
+          </div></div>
+        </div>
+      </div>
+
+      <div class="day-card" onclick="tog(this)">
+        <div class="day-date"><div class="day-wd">Sáb</div><div class="day-n">17</div><div class="day-mo">Out</div></div>
+        <div class="day-body">
+          <div class="day-top">
+            <div><div class="day-t">Madrid → São Paulo → Campo Grande (Voo de Retorno)</div><div class="day-loc">Churros na San Ginés · Voo Royal Air Maroc via Casablanca (CMN)</div></div>
+            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="day-tags"><span class="tag th">Voo 13:35 MAD→CMN ✓</span><span class="tag tw">Conexão Marrocos</span><span class="tag td">Tax Free Barajas</span></div>
+          <div class="day-detail"><div class="sched">
+            <div class="si"><span class="si-t">08:00</span><div class="si-a"><strong>Churros com Chocolate na San Ginés</strong><small>Parada histórica tradicional de funcionamento 24h para fechar a viagem.</small></div></div>
+            <div class="si"><span class="si-t">09:30</span><div class="si-a"><strong>Últimas Compras no El Corte Inglés</strong><small>Janela livre para presentes e lembranças de última hora no centro de Madrid.</small></div></div>
+            <div class="si"><span class="si-t">11:00</span><div class="si-a"><strong>Check-out e Fechamento de Malas</strong><small>Encerramento oficial da estadia no Airbnb.</small></div></div>
+            <div class="si"><span class="si-t">11:30</span><div class="si-a"><strong>Deslocamento para o Aeroporto MAD</strong><small>Metrô Linha 8 direto até a estação T4 ou táxi fixo (~35 min).</small></div></div>
+            <div class="si"><span class="si-t">13:35</span><div class="si-a"><strong>✈️ Voo Transatlântico Madrid → São Paulo</strong><small>Operado via Royal Air Maroc com conexão internacional programada em Casablanca (CMN). Atenção para mudança de terminais na conexão local marroquina!</small></div></div>
+          </div></div>
+        </div>
+      </div>
+
+      <div class="day-card" onclick="tog(this)">
+        <div class="day-date"><div class="day-wd">Dom</div><div class="day-n">18</div><div class="day-mo">Out</div></div>
+        <div class="day-body">
+          <div class="day-top">
+            <div><div class="day-t">Pernoite em Guarulhos → Chegada em Campo Grande</div><div class="day-loc">Desembarque no Brasil · Voo Final de Conexão Doméstica para CGR</div></div>
+            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="day-tags"><span class="tag th">Pouso GRU 22:30 ✓</span><span class="tag th">Voo 09:00 GRU→CGR ✓</span><span class="tag td">Home</span></div>
+          <div class="day-detail"><div class="sched">
+            <div class="si"><span class="si-t">22:30</span><div class="si-a"><strong>Desembarque no Aeroporto de Guarulhos (GRU)</strong><small>Chegada prevista no Terminal 2. Migração interna e retirada de bagagens.</small></div></div>
+            <div class="si"><span class="si-t">Noite</span><div class="si-a"><strong>Pernoite Estratégica em Airbnb próximo a GRU</strong><small>Descanso essencial controlado nas imediações do aeroporto paulista.</small></div></div>
+            <div class="si"><span class="si-t">09:00</span><div class="si-a"><strong>✈️ Voo Final São Paulo (GRU) → Campo Grande (CGR)</strong><small>Embarque doméstico na manhã de domingo retornando para casa.</small></div></div>
+            <div class="si"><span class="si-t">09:50</span><div class="si-a"><strong>Pouso em Campo Grande</strong><small>Fim definitivo da jornada europeia de 2026. Bem-vindos de volta!</small></div></div>
+          </div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
 </section>
 
@@ -400,16 +951,60 @@ footer{background:#07101a;padding:2.8rem 5vw 6.5rem 5vw;display:flex;align-items
     <div class="s-eye fi"><span class="s-label">Preparativos</span></div>
     <h2 class="s-title fi">Antes de <em>Embarcar</em></h2>
     <div class="cl-grid fi">
-      <div class="cl-group">
-        <div class="cl-head"><span class="cl-ico">📋</span>Documentação</div>
+      <div class="cl-group" data-group-index="0">
+        <div class="cl-head"><span class="cl-ico">📋</span><span class="group-title-text">Documentação</span></div>
+        <button class="btn-card-edit" onclick="openChecklistModal(0)" title="Modificar Itens">+</button>
         <ul class="cl-list">
-          <li class="cl-item" onclick="chk(this)"><input type="checkbox"><span class="cl-txt">Passaporte Válido</span><span class="bdg bw">Obrigatório</span></li>
-          <li class="cl-item" onclick="chk(this)"><input type="checkbox"><span class="cl-txt">Seguro Viagem Europa (Schengen)</span><span class="bdg bo">Pendente</span></li>
+          <li class="cl-item" onclick="chk(this)"><input type="checkbox"><span class="cl-txt">Passaportes válidos (mínimo 3 meses pós-retorno)</span><span class="bdg bw">Obrigatório</span></li>
+          <li class="cl-item" onclick="chk(this)"><input type="checkbox"><span class="cl-txt">Seguro Viagem obrigatório (Tratado de Schengen)</span><span class="bdg bw">Obrigatório</span></li>
+          <li class="cl-item" onclick="chk(this)"><input type="checkbox"><span class="cl-txt">Passagens impressas e comprovantes digitais de voos</span><span class="bdg bo">Pendente</span></li>
+          <li class="cl-item" onclick="chk(this)"><input type="checkbox"><span class="cl-txt">Comprovantes de hospedagens e reservas de hotéis</span><span class="bdg bo">Pendente</span></li>
+        </ul>
+      </div>
+      <div class="cl-group" data-group-index="1">
+        <div class="cl-head"><span class="cl-ico">🎫</span><span class="group-title-text">Ingressos Antecipados</span></div>
+        <button class="btn-card-edit" onclick="openChecklistModal(1)" title="Modificar Itens">+</button>
+        <ul class="cl-list">
+          <li class="cl-item" onclick="chk(this)"><input type="checkbox"><span class="cl-txt">Vaticano (Museus e Capela Sistina - Roma)</span><span class="bdg bo">Pendente</span></li>
+          <li class="cl-item" onclick="chk(this)"><input type="checkbox"><span class="cl-txt">Coliseu e Fórum Romano (Roma)</span><span class="bdg bo">Pendente</span></li>
+          <li class="cl-item" onclick="chk(this)"><input type="checkbox"><span class="cl-txt">Sagrada Família (Barcelona)</span><span class="bdg bo">Pendente</span></li>
+          <li class="cl-item" onclick="chk(this)"><input type="checkbox"><span class="cl-txt">Bilhetes de trens internos de Alta Velocidade (Itália/Espanha)</span><span class="bdg bo">Pendente</span></li>
+        </ul>
+      </div>
+      <div class="cl-group" data-group-index="2">
+        <div class="cl-head"><span class="cl-ico">🎒</span><span class="group-title-text">Logística Geral</span></div>
+        <button class="btn-card-edit" onclick="openChecklistModal(2)" title="Modificar Itens">+</button>
+        <ul class="cl-list">
+          <li class="cl-item" onclick="chk(this)"><input type="checkbox"><span class="cl-txt">Ativar chip de dados internacional / e-SIM</span><span class="bdg bg">Pronto</span></li>
+          <li class="cl-item" onclick="chk(this)"><input type="checkbox"><span class="cl-txt">Configurar cartões e contas multimoeda (Wise/Nomad)</span><span class="bdg bg">Pronto</span></li>
+          <li class="cl-item" onclick="chk(this)"><input type="checkbox"><span class="cl-txt">Adaptadores de tomada padrão europeu</span><span class="bdg bw">Obrigatório</span></li>
+          <li class="cl-item" onclick="chk(this)"><input type="checkbox"><span class="cl-txt">Remédios de uso pessoal com receita médica</span><span class="bdg bo">Pendente</span></li>
         </ul>
       </div>
     </div>
   </div>
 </section>
+
+<div id="checklist-modal" class="modal-overlay" onclick="closeChecklistModal(event)">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <span class="modal-close" onclick="closeChecklistModal()">&times;</span>
+    <h3 id="modal-group-title" class="modal-ttl">Modificar Itens</h3>
+    
+    <ul id="modal-items-container" class="modal-items-list"></ul>
+    
+    <div class="modal-form">
+      <input type="text" id="modal-new-item-text" class="modal-input" placeholder="Novo item do checklist...">
+      <select id="modal-new-item-badge" class="modal-select">
+        <option value="bo">Pendente (Azul)</option>
+        <option value="bw">Obrigatório (Laranja)</option>
+        <option value="bg">Pronto (Verde)</option>
+      </select>
+      <button class="btn-modal-add" onclick="addItemToModalList()">Incluir</button>
+    </div>
+    
+    <button class="btn-modal-save" onclick="saveChecklistModalChanges()">Confirmar e Atualizar Card</button>
+  </div>
+</div>
 
 <section id="dicas">
   <div class="wrap">
@@ -420,7 +1015,27 @@ footer{background:#07101a;padding:2.8rem 5vw 6.5rem 5vw;display:flex;align-items
         <div class="tip-ico">💶</div>
         <div class="tip-ttl">Dinheiro & Taxas</div>
         <ul class="tip-ul">
-          <li><span class="td2"></span>Levar cartão multimoedas (Wise/Nomad)</li>
+          <li><span class="td2"></span>Leve a maior parte do saldo em cartões de débito internacionais (Wise, Nomad) pela economia no IOF.</li>
+          <li><span class="td2"></span>Tenha sempre de 100€ a 150€ em espécie por segurança para comércios muito pequenos ou emergências.</li>
+          <li><span class="td2"></span>Solicite o formulário de <strong>Tax Free</strong> nas lojas de grandes marcas ao gastar acima do limite para obter reembolso do imposto em Barajas.</li>
+        </ul>
+      </div>
+      <div class="tip-card">
+        <div class="tip-ico">🚇</div>
+        <div class="tip-ttl">Transporte Urbano</div>
+        <ul class="tip-ul">
+          <li><span class="td2"></span>Em Lisboa, use o cartão Viva Viagem ou utilize o cartão por aproximação direto nas catracas do Metrô.</li>
+          <li><span class="td2"></span>Em Roma e Barcelona, compre passes integrados de múltiplos dias se for realizar mais de 4 viagens diárias de transporte público.</li>
+          <li><span class="td2"></span>Baixe o app oficial da <strong>Trenitalia</strong> e da <strong>Renfe</strong> para carregar e validar as passagens de trem no celular.</li>
+        </ul>
+      </div>
+      <div class="tip-card">
+        <div class="tip-ico">🎒</div>
+        <div class="tip-ttl">Segurança & Conforto</div>
+        <ul class="tip-ul">
+          <li><span class="td2"></span>Cuidado redobrado com pickpockets (batedores de carteira) na linha 28 em Lisboa, estações de Roma e na avenida Las Ramblas.</li>
+          <li><span class="td2"></span>Calçados: Dê preferência absoluta para tênis macios e já amaciados. O piso de paralelepípedo europeu castiga muito os pés.</li>
+          <li><span class="td2"></span>Roupas para Igrejas: Lembre-se de cobrir ombros e joelhos nos dias de visita ao Vaticano e ao Duomo de Florença.</li>
         </ul>
       </div>
     </div>
@@ -540,9 +1155,10 @@ let firebaseLoaded = false;
 let saveTimer = null;
 let statusTimer = null;
 let activeDateCard = null;
+let activeChecklistGroupIndex = null;
 
-const ptWeekdays = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sab"];
-const ptMonths = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+const ptWeekdays = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+const ptMonths = ["Set", "Out", "Nov", "Dez", "Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago"];
 
 function getClientId(){
   try{
@@ -604,7 +1220,7 @@ function collectEditableContent(){
   applyEditableIds();
   const content = {};
   document.querySelectorAll("[data-edit-id]").forEach(el => {
-    if(el.closest("#roteiro")) return;
+    if(el.closest("#roteiro") || el.closest("#checklist")) return;
     content[el.dataset.editId] = el.innerHTML;
   });
   return content;
@@ -614,7 +1230,7 @@ function applyEditableContent(content){
   if(!hasMeaningfulContent(content)) return;
   applyEditableIds();
   document.querySelectorAll("[data-edit-id]").forEach(el => {
-    if(el.closest("#roteiro")) return;
+    if(el.closest("#roteiro") || el.closest("#checklist")) return;
     const value = content[el.dataset.editId];
     if(typeof value === "string" && hasVisibleText(value) && el.innerHTML !== value) el.innerHTML = sanitizeHtml(value);
   });
@@ -646,6 +1262,32 @@ function applyRoteiroHtml(html){
   tpl.content.querySelectorAll(".country-block").forEach(block => wrap.insertBefore(block, insertBefore));
   enhanceItineraryControls();
   applyEditableIds();
+}
+
+function collectChecklistHtml() {
+  const container = document.querySelector("#checklist .cl-grid");
+  if(!container) return "";
+  const clone = container.cloneNode(true);
+  clone.querySelectorAll(".btn-card-edit").forEach(btn => btn.remove());
+  return clone.innerHTML;
+}
+
+function applyChecklistHtml(html) {
+  if(!hasVisibleText(html)) return;
+  const container = document.querySelector("#checklist .cl-grid");
+  if(!container) return;
+  container.innerHTML = sanitizeHtml(html);
+  
+  document.querySelectorAll("#checklist .cl-group").forEach(group => {
+    const idx = group.dataset.groupIndex;
+    if(group.querySelector(".btn-card-edit")) return;
+    const btn = document.createElement("button");
+    btn.className = "btn-card-edit";
+    btn.textContent = "+";
+    btn.title = "Modificar Itens";
+    btn.onclick = () => window.openChecklistModal(Number(idx));
+    group.insertBefore(btn, group.querySelector(".cl-list"));
+  });
 }
 
 function getTripYear(){
@@ -713,7 +1355,6 @@ function setupDayDateControls(){
   document.querySelectorAll(".day-date .day-wd,.day-date .day-n,.day-date .day-mo").forEach(el => {
     el.removeAttribute("contenteditable");
     el.removeAttribute("data-editable-applied");
-    el.removeAttribute("data-edit-id");
     el.setAttribute("role", "button");
     el.setAttribute("tabindex", "0");
     el.setAttribute("title", "Escolher data");
@@ -738,10 +1379,11 @@ function applyChecklistState(state){
 
 function collectPageState(){
   return {
-    schemaVersion: 2,
+    schemaVersion: 3,
     updatedAt: Date.now(),
     updatedBy: clientId,
     checklist: getChecklistState(),
+    checklistHtml: collectChecklistHtml(),
     content: collectEditableContent(),
     roteiroHtml: collectRoteiroHtml()
   };
@@ -750,7 +1392,8 @@ function collectPageState(){
 async function savePageState({feedback = true} = {}){
   if(applyingRemote || !firebaseLoaded) return;
   const btn = document.querySelector(".btn-save");
-  const original = btn.innerHTML;
+  let original = "";
+  if(btn) original = btn.innerHTML;
   try{
     if(feedback && btn) btn.innerHTML = "Salvando...";
     await set(pageRef, collectPageState());
@@ -785,12 +1428,12 @@ function addTimeButton(sched){
   const btn = document.createElement("button");
   btn.className = "add-time-btn";
   btn.type = "button";
-  btn.textContent = "+ Adicionar Horario";
+  btn.textContent = "+ Adicionar Horário";
   btn.addEventListener("click", e => {
     e.stopPropagation();
     const row = document.createElement("div");
     row.className = "si";
-    row.innerHTML = `<span class="si-t" contenteditable="true">00:00</span><div class="si-a"><strong contenteditable="true">Novo Evento</strong><small contenteditable="true">Descricao</small></div>`;
+    row.innerHTML = `<span class="si-t" contenteditable="true">00:00</span><div class="si-a"><strong contenteditable="true">Novo Evento</strong><small contenteditable="true">Descrição</small></div>`;
     sched.insertBefore(row, btn);
     enhanceItineraryControls();
     scheduleSave();
@@ -809,7 +1452,7 @@ function addDayButton(timeline){
     const card = document.createElement("div");
     card.className = "day-card open";
     card.setAttribute("onclick", "tog(this)");
-    card.innerHTML = `<div class="day-date"><div class="day-wd">Seg</div><div class="day-n">01</div><div class="day-mo">Jan</div></div><div class="day-body"><div class="day-top"><div><div class="day-t" contenteditable="true">Novo Dia</div><div class="day-loc" contenteditable="true">Localizacao</div></div><svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></div><div class="day-tags"></div><div class="day-detail"><div class="sched"></div></div></div>`;
+    card.innerHTML = `<div class="day-date"><div class="day-wd">Seg</div><div class="day-n">01</div><div class="day-mo">Jan</div></div><div class="day-body"><div class="day-top"><div><div class="day-t" contenteditable="true">Novo Dia</div><div class="day-loc" contenteditable="true">Localização</div></div><svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></div><div class="day-tags"></div><div class="day-detail"><div class="sched"></div></div></div>`;
     timeline.insertBefore(card, btn);
     enhanceItineraryControls();
     scheduleSave();
@@ -826,8 +1469,7 @@ function getCountryFlag(name){
     portugal:"PT", brasil:"BR", brazil:"BR", espanha:"ES", spain:"ES", italia:"IT", italy:"IT", franca:"FR", france:"FR",
     alemanha:"DE", germany:"DE", austria:"AT", belgica:"BE", belgium:"BE", holanda:"NL", netherlands:"NL",
     suica:"CH", switzerland:"CH", "reino unido":"GB", uk:"GB", inglaterra:"GB", england:"GB", irlanda:"IE", ireland:"IE",
-    polonia:"PL", poland:"PL", "czech republic":"CZ", czechia:"CZ", grecia:"GR", greece:"GR", turquia:"TR", turkey:"TR",
-    japao:"JP", japan:"JP", china:"CN", "estados unidos":"US", usa:"US", canada:"CA"
+    polonia:"PL", poland:"PL", grecia:"GR", greece:"GR", turquia:"TR", turkey:"TR", japao:"JP", japan:"JP"
   };
   const normalized = name.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   const code = aliases[normalized];
@@ -840,167 +1482,240 @@ function addCountryButton(){
   const btn = document.createElement("button");
   btn.className = "add-country-btn";
   btn.type = "button";
-  btn.textContent = "+ Adicionar Pais";
+  btn.textContent = "🗺️ Adicionar Novo País ao Roteiro";
+  btn.style.width = "100%";
+  btn.style.padding = "1.2rem";
+  btn.style.border = "1px dashed var(--gold)";
+  btn.style.background = "transparent";
+  btn.style.color = "var(--gold)";
+  btn.style.fontSize = "0.75rem";
+  btn.style.letterSpacing = "0.15em";
+  btn.style.textTransform = "uppercase";
+  btn.style.marginTop = "2rem";
+
   btn.addEventListener("click", () => {
-    const country = prompt("Nome do pais:");
-    if(!country) return;
     const block = document.createElement("div");
     block.className = "country-block fi v";
-    block.innerHTML = `<div class="country-head"><span class="country-flag">${getCountryFlag(country)}</span><div><div class="country-nm" contenteditable="true">${country}</div><div class="country-cities" contenteditable="true">Cidades</div></div></div><div class="timeline"></div>`;
+    block.innerHTML = `<div class="country-head"><span class="country-flag">🌍</span><div><div class="country-nm" contenteditable="true">Novo País</div><div class="country-cities" contenteditable="true">Cidades Relacionadas</div></div></div><div class="timeline"></div>`;
     wrap.insertBefore(block, btn);
+    const nm = block.querySelector(".country-nm");
+    nm.addEventListener("input", () => {
+      const flag = getCountryFlag(nm.textContent);
+      if(flag) block.querySelector(".country-flag").textContent = flag;
+    });
     enhanceItineraryControls();
     scheduleSave();
   });
   wrap.appendChild(btn);
 }
 
-function addDeleteButtons(){
-  const setDeleteButtonIcon = btn => {
-    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path><path d="M10 11v5"></path><path d="M14 11v5"></path></svg>`;
-    btn.setAttribute("aria-label", "Excluir");
-    btn.setAttribute("title", "Excluir");
-  };
-  document.querySelectorAll(".country-head").forEach(head => {
-    if(head.querySelector(":scope > .item-delete-btn")) return;
-    const btn = document.createElement("button");
-    btn.className = "item-delete-btn";
-    btn.type = "button";
-    setDeleteButtonIcon(btn);
-    btn.addEventListener("click", e => {
-      e.stopPropagation();
-      head.closest(".country-block")?.remove();
+function appendDeleteButton(target, onDelete){
+  if(!target || target.querySelector(":scope > .item-delete-btn")) return;
+  const btn = document.createElement("button");
+  btn.className = "item-delete-btn";
+  btn.type = "button";
+  btn.title = "Excluir Item";
+  btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`;
+  btn.addEventListener("click", e => {
+    e.stopPropagation();
+    if(confirm("Confirmar a exclusão permanente deste item do roteiro?")){
+      onDelete();
       scheduleSave();
-    });
-    head.appendChild(btn);
+    }
   });
-  document.querySelectorAll(".day-card").forEach(card => {
-    if(card.querySelector(".item-delete-btn.day-trash")) return;
-    const top = card.querySelector(".day-top") || card.querySelector(".day-body") || card;
-    const btn = document.createElement("button");
-    btn.className = "item-delete-btn day-trash";
-    btn.type = "button";
-    setDeleteButtonIcon(btn);
-    btn.addEventListener("click", e => {
-      e.stopPropagation();
-      card.remove();
-      scheduleSave();
-    });
-    top.appendChild(btn);
-  });
-  document.querySelectorAll(".si").forEach(row => {
-    if(row.querySelector(":scope > .item-delete-btn")) return;
-    const btn = document.createElement("button");
-    btn.className = "item-delete-btn";
-    btn.type = "button";
-    setDeleteButtonIcon(btn);
-    btn.addEventListener("click", e => {
-      e.stopPropagation();
-      row.remove();
-      scheduleSave();
-    });
-    row.appendChild(btn);
-  });
+  target.appendChild(btn);
 }
 
 function enhanceItineraryControls(){
-  removeEditorControls();
-  document.querySelectorAll(".day-card").forEach(card => card.setAttribute("onclick", "tog(this)"));
-  document.querySelectorAll(".sched").forEach(addTimeButton);
-  document.querySelectorAll(".timeline").forEach(addDayButton);
-  addCountryButton();
-  addDeleteButtons();
-  applyEditableIds();
+  document.querySelectorAll(".country-block").forEach(block => {
+    const head = block.querySelector(".country-head");
+    if(head) appendDeleteButton(head, () => block.remove());
+    const timeline = block.querySelector(".timeline");
+    if(timeline) addDayButton(timeline);
+  });
+  document.querySelectorAll(".day-card").forEach(card => {
+    const top = card.querySelector(".day-top");
+    if(top) appendDeleteButton(top, () => card.remove());
+    const sched = card.querySelector(".sched");
+    if(sched) addTimeButton(sched);
+  });
+  document.querySelectorAll(".si").forEach(row => {
+    appendDeleteButton(row, () => row.remove());
+  });
   setupDayDateControls();
 }
 
-function setupUi(){
-  window.tog = function(card){ card.classList.toggle("open"); };
-  window.setMap = function(btn, q){
-    document.querySelectorAll(".mb").forEach(b => b.classList.remove("on"));
-    btn.classList.add("on");
-    document.getElementById("map-iframe").src = "https://maps.google.com/maps?q=" + encodeURIComponent(q) + "&z=14&output=embed";
+window.openChecklistModal = function(groupIndex) {
+  activeChecklistGroupIndex = groupIndex;
+  const group = document.querySelector(`#checklist .cl-group[data-group-index="${groupIndex}"]`);
+  if(!group) return;
+  
+  const title = group.querySelector(".group-title-text")?.textContent || "Modificar Itens";
+  document.getElementById("modal-group-title").textContent = title;
+  
+  const itemsContainer = document.getElementById("modal-items-container");
+  itemsContainer.innerHTML = "";
+  
+  group.querySelectorAll(".cl-list .cl-item").forEach((item, idx) => {
+    const txt = item.querySelector(".cl-txt")?.textContent || "";
+    const badgeEl = item.querySelector(".bdg");
+    let badgeClass = "bo";
+    if(badgeEl?.classList.contains("bw")) badgeClass = "bw";
+    if(badgeEl?.classList.contains("bg")) badgeClass = "bg";
+    
+    const row = document.createElement("li");
+    row.className = "modal-row";
+    row.innerHTML = `
+      <span class="modal-row-txt" contenteditable="true">${txt}</span>
+      <select class="modal-select modal-row-badge-select" style="padding:0.2rem; font-size:0.65rem;">
+        <option value="bo" ${badgeClass === 'bo' ? 'selected' : ''}>Pendente</option>
+        <option value="bw" ${badgeClass === 'bw' ? 'selected' : ''}>Obrigatório</option>
+        <option value="bg" ${badgeClass === 'bg' ? 'selected' : ''}>Pronto</option>
+      </select>
+      <button class="btn-row-del" onclick="this.parentElement.remove()">Excluir</button>
+    `;
+    itemsContainer.appendChild(row);
+  });
+  
+  document.getElementById("modal-new-item-text").value = "";
+  document.getElementById("checklist-modal").classList.add("open");
+};
+
+window.closeChecklistModal = function(e) {
+  if(!e || e.target.classList.contains("modal-overlay") || e.target.classList.contains("modal-close")) {
+    document.getElementById("checklist-modal").classList.remove("open");
+  }
+};
+
+window.addItemToModalList = function() {
+  const input = document.getElementById("modal-new-item-text");
+  const txt = input.value.trim();
+  if(!txt) return;
+  const badgeClass = document.getElementById("modal-new-item-badge").value;
+  
+  const itemsContainer = document.getElementById("modal-items-container");
+  const row = document.createElement("li");
+  row.className = "modal-row";
+  row.innerHTML = `
+    <span class="modal-row-txt" contenteditable="true">${txt}</span>
+    <select class="modal-select modal-row-badge-select" style="padding:0.2rem; font-size:0.65rem;">
+      <option value="bo" ${badgeClass === 'bo' ? 'selected' : ''}>Pendente</option>
+      <option value="bw" ${badgeClass === 'bw' ? 'selected' : ''}>Obrigatório</option>
+      <option value="bg" ${badgeClass === 'bg' ? 'selected' : ''}>Pronto</option>
+    </select>
+    <button class="btn-row-del" onclick="this.parentElement.remove()">Excluir</button>
+  `;
+  itemsContainer.appendChild(row);
+  input.value = "";
+};
+
+window.saveChecklistModalChanges = function() {
+  if(activeChecklistGroupIndex === null) return;
+  const group = document.querySelector(`#checklist .cl-group[data-group-index="${activeChecklistGroupIndex}"]`);
+  if(!group) return;
+  
+  const listContainer = group.querySelector(".cl-list");
+  if(!listContainer) return;
+  listContainer.innerHTML = "";
+  
+  const badgeLabels = { bo: "Pendente", bw: "Obrigatório", bg: "Pronto" };
+  
+  document.querySelectorAll("#modal-items-container .modal-row").forEach(row => {
+    const txt = row.querySelector(".modal-row-txt")?.textContent.trim();
+    if(!txt) return;
+    const badgeClass = row.querySelector(".modal-row-badge-select").value;
+    const badgeLabel = badgeLabels[badgeClass];
+    
+    const li = document.createElement("li");
+    li.className = "cl-item";
+    li.onclick = function() { window.chk(this); };
+    li.innerHTML = `<input type="checkbox"><span class="cl-txt">${txt}</span><span class="bdg ${badgeClass}">${badgeLabel}</span>`;
+    listContainer.appendChild(li);
+  });
+  
+  document.getElementById("checklist-modal").classList.remove("open");
+  savePageState();
+};
+
+window.salvarAlteracoes = function(){
+  savePageState({feedback:true});
+};
+
+window.chk = function(el){
+  if(e && (e.target.tagName === "BUTTON" || e.target.closest(".btn-card-edit"))) return;
+  const cb = el.querySelector("input");
+  if(e && e.target !== cb) cb.checked = !cb.checked;
+  el.classList.toggle("done", cb.checked);
+  scheduleSave();
+};
+
+window.tog = function(el){
+  if(window.event && (window.event.target.closest("[contenteditable=true]") || window.event.target.closest("button") || window.event.target.closest("input") || window.event.target.closest(".day-wd") || window.event.target.closest(".day-n") || window.event.target.closest(".day-mo"))) return;
+  el.classList.toggle("open");
+};
+
+window.setMap = function(btn, type){
+  document.querySelectorAll(".map-btns .mb").forEach(b => b.classList.remove("on"));
+  btn.classList.add("on");
+  const urls = {
+    geral: "https://maps.google.com/maps?q=Europa&z=4&output=embed",
+    portugal: "https://maps.google.com/maps?q=Lisboa,Sintra,Setubal&z=9&output=embed",
+    italia: "https://maps.google.com/maps?q=Veneza,Florenca,Roma&z=6&output=embed"
   };
-  window.chk = function(item){
-    if(applyingRemote) return;
-    const cb = item.querySelector("input");
-    if(!cb) return;
-    cb.checked = !cb.checked;
-    item.classList.toggle("done", cb.checked);
-    scheduleSave();
-  };
-  window.salvarAlteracoes = () => savePageState({feedback:true});
+  const iframe = document.getElementById("map-iframe");
+  if(iframe && urls[type]) iframe.src = urls[type];
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+  applyEditableIds();
+  addCountryButton();
+  enhanceItineraryControls();
+  setupDatePicker();
+
+  document.addEventListener("input", e => {
+    if(e.target.hasAttribute("data-edit-id") || e.target.closest("#roteiro") || e.target.closest("#checklist")) scheduleSave();
+  });
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        entry.target.classList.add("v");
+        observer.unobserve(entry.target);
+      }
+    });
+  }, {threshold:0.05});
+  document.querySelectorAll(".fi").forEach(el => observer.observe(el));
 
   window.addEventListener("scroll", () => {
     const h = document.documentElement;
-    const pct = h.scrollTop / (h.scrollHeight - h.clientHeight) * 100;
-    document.getElementById("prog").style.width = pct + "%";
-  });
-
-  const links = document.querySelectorAll(".nav-links a");
-  const sectionObserver = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if(!entry.isIntersecting) return;
-      links.forEach(link => link.classList.remove("on"));
-      document.querySelector(`.nav-links a[href="#${entry.target.id}"]`)?.classList.add("on");
-    });
-  }, {rootMargin:"-40% 0px -55% 0px"});
-  document.querySelectorAll("section").forEach(section => sectionObserver.observe(section));
-
-  const fadeObserver = new IntersectionObserver(entries => {
-    entries.forEach(entry => { if(entry.isIntersecting) entry.target.classList.add("v"); });
-  }, {threshold:.08});
-  document.querySelectorAll(".fi").forEach(el => fadeObserver.observe(el));
-
-  document.addEventListener("click", e => {
-    if(e.target.closest("[contenteditable='true']")) e.stopPropagation();
-  }, true);
-  document.addEventListener("mousedown", e => {
-    if(e.target.closest("[contenteditable='true']")) e.stopPropagation();
-  }, true);
-  document.addEventListener("input", e => {
-    if(e.target.closest("[contenteditable='true']")) scheduleSave();
-  });
-  document.addEventListener("keydown", e => {
-    if(!e.target.closest(".day-date .day-wd,.day-date .day-n,.day-date .day-mo")) return;
-    if(e.key !== "Enter" && e.key !== " ") return;
-    e.preventDefault();
-    e.target.click();
-  });
-  setupDatePicker();
-}
-
-function applyRemoteState(data){
-  if(!data || data.updatedBy === clientId) return;
-  const hasRemoteText = hasMeaningfulContent(data.content) || hasVisibleText(data.roteiroHtml);
-  if(!hasRemoteText){
-    showStatus("Estado vazio ignorado", false);
-    return;
-  }
-  applyingRemote = true;
-  clearTimeout(saveTimer);
-  try{
-    applyRoteiroHtml(data.roteiroHtml);
-    applyEditableContent(data.content);
-    applyChecklistState(data.checklist);
-    showStatus("Atualizado da nuvem");
-  }finally{
-    applyingRemote = false;
-  }
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  setupUi();
-  enhanceItineraryControls();
-  applyEditableIds();
+    const st = h.scrollTop || document.body.scrollTop;
+    const sh = h.scrollHeight || document.body.scrollHeight;
+    const p = (st / (sh - h.clientHeight)) * 100;
+    const pBar = document.getElementById("prog");
+    if(pBar) pBar.style.width = p + "%";
+    
+    const nav = document.getElementById("navbar");
+    if(nav) nav.style.background = st > 50 ? "rgba(14,14,14,.96)" : "rgba(14,14,14,.92)";
+  }, {passive:true});
 
   onValue(pageRef, snapshot => {
+    firebaseLoaded = true;
     const data = snapshot.val();
-    firebaseLoaded = true;
-    applyRemoteState(data);
+    if(!data) return;
+    if(data.updatedBy === clientId) return;
+
+    applyingRemote = true;
+    if(data.schemaVersion === 3){
+      if(data.content) applyEditableContent(data.content);
+      if(data.roteiroHtml) applyRoteiroHtml(data.roteiroHtml);
+      if(data.checklistHtml) applyChecklistHtml(data.checklistHtml);
+      if(data.checklist) applyChecklistState(data.checklist);
+    }
+    applyingRemote = false;
+    showStatus("Nuvem Atualizada");
   }, error => {
+    console.error("Erro ao ler do Firebase:", error);
     firebaseLoaded = true;
-    console.error("Erro ao ouvir Firebase:", error);
-    showStatus("Firebase offline", false);
   });
 });
 </script>
