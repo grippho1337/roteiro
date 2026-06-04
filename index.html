@@ -440,526 +440,452 @@ footer{background:#07101a;padding:2.8rem 5vw 6.5rem 5vw;display:flex;align-items
   </button>
 </div>
 
-<!-- ─── JAVASCRIPT & CONFIGURAÇÃO FIREBASE ─── -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-  import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
-
-  // Suas credenciais oficiais do aplicativo Web do Firebase
-  const firebaseConfig = {
-    apiKey: "AIzaSyD-4pQTmIPm6G3jlvo6II70ecn3ckOjDe0",
-    authDomain: "boboes-na-europa.firebaseapp.com",
-    databaseURL: "https://boboes-na-europa-default-rtdb.firebaseio.com",
-    projectId: "boboes-na-europa",
-    storageBucket: "boboes-na-europa.firebasestorage.app",
-    messagingSenderId: "1008728997217",
-    appId: "1:1008728997217:web:6c6bdb4ecae3de007e5920",
-    measurementId: "G-E9YC45KKMW"
-  };
-
-  // Inicializando o Firebase
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
-window.firebaseDB=db;
-window.firebaseRef=ref;
-window.firebaseSet=set;window.firebaseGet=get;
-  const checklistRef = ref(db, 'viagem/checklist');
-
-  // Variável para travar cliques duplos durante a sincronização inicial
-  let carregandoDados = true;
-
-  // Escuta alterações do Firebase em Tempo Real para todos os usuários logados
-  onValue(checklistRef, (snapshot) => {
-    const data = snapshot.val();
-    const items = document.querySelectorAll('.cl-item');
-    
-    if (data && Array.isArray(data)) {
-      data.forEach((isChecked, idx) => {
-        if (items[idx]) {
-          const cb = items[idx].querySelector('input');
-          cb.checked = isChecked;
-          items[idx].classList.toggle('done', isChecked);
-        }
-      });
-    }
-    carregandoDados = false;
-  });
-
-  // Torna as funções acessíveis no escopo global (para os cliques do HTML antigo)
-  window.chk = function(item) {
-    if (carregandoDados) return; // Evita bugar se clicar antes de carregar da nuvem
-    const cb = item.querySelector('input');
-    cb.checked = !cb.checked;
-    item.classList.toggle('done', cb.checked);
-  }
-
-  window.salvarAlteracoes = function() {
-    const items = [...document.querySelectorAll('.cl-item')];
-    const state = items.map(i => i.querySelector('input').checked);
-    
-    const btn = document.querySelector('.btn-save');
-    const txtOriginal = btn.innerHTML;
-
-    // Salvando no Banco de Dados Global do Firebase
-    set(checklistRef, state)
-      .then(() => {
-        // Feedback visual de sucesso
-        btn.style.background = '#3d6b5c'; 
-        btn.style.color = '#fff';
-        btn.innerHTML = '✓ Salvo na Nuvem!';
-        
-        setTimeout(() => {
-          btn.style.background = '';
-          btn.style.color = '';
-          btn.innerHTML = txtOriginal;
-        }, 2000);
-      })
-      .catch((error) => {
-        console.error("Erro ao salvar:", error);
-        alert("Erro ao conectar com o banco de dados.");
-      });
-  }
-</script>
-
-<script>
-// Mantendo os scripts locais de interface (Scroll e expansões) independentes
-window.addEventListener('scroll', () => {
-  const h = document.documentElement, b = document.body, st = 'scrollTop', sh = 'scrollHeight';
-  const pct = (h[st] || b[st]) / ((h[sh] || b[sh]) - h.clientHeight) * 100;
-  document.getElementById('prog').style.width = pct + '%';
-});
-
-const secs = document.querySelectorAll('section');
-const links = document.querySelectorAll('.nav-links a');
-const io = new IntersectionObserver(es => {
-  es.forEach(e => {
-    if(e.isIntersecting){
-      links.forEach(l => l.classList.remove('on'));
-      const a = document.querySelector(`.nav-links a[href="#${e.target.id}"]`);
-      if(a) a.classList.add('on');
-    }
-  });
-},{rootMargin: '-40% 0px -55% 0px'});
-secs.forEach(s => io.observe(s));
-
-const fo = new IntersectionObserver(es => {
-  es.forEach(e => { if(e.isIntersecting) e.target.classList.add('v') });
-},{threshold: .08});
-document.querySelectorAll('.fi').forEach(el => fo.observe(el));
-
-function tog(c){ c.classList.toggle('open'); }
-
-function setMap(btn, q){
-  document.querySelectorAll('.mb').forEach(b => b.classList.remove('on'));
-  btn.classList.add('on');
-  document.getElementById('map-iframe').src = 'https://maps.google.com/maps?q='+encodeURIComponent(q)+'&z=14&output=embed';
-}
-</script>
-
-<script>
-document.addEventListener('DOMContentLoaded',()=>{
-  const selectors=[
-    '.hero-eyebrow','.hero-title','.hero-sub','.chip','.dest-city','.dest-when','.dest-nights',
-    '.country-nm','.country-cities','.day-t','.day-loc','.tag','.si-a strong','.si-a small',
-    '.cl-txt','.tip-ttl','.tip-ul li','.ft-brand','.ft-meta','.s-title','.s-label'
-  ];
-
-  let idx=0;
-  document.querySelectorAll(selectors.join(',')).forEach(el=>{
-    if(el.dataset.editableApplied) return;
-    el.dataset.editableApplied='1';
-    el.setAttribute('contenteditable','true');
-    el.dataset.editId='txt_'+(idx++);
-  });
-
-  const contentRef = window.firebaseContentRef || null;
-
-  if(window.salvarAlteracoes){
-    const oldSave=window.salvarAlteracoes;
-    window.salvarAlteracoes=function(){
-      const texts={};
-      document.querySelectorAll('[data-edit-id]').forEach(el=>{
-        texts[el.dataset.editId]=el.innerHTML;
-      });
-
-      if(window.firebaseDB && window.firebaseSet && window.firebaseRef){
-        const r=window.firebaseRef(window.firebaseDB,'viagem/content');
-        window.firebaseSet(r,texts).catch(console.error);
-      }
-
-      oldSave();
-    }
-  }
-});
-</script>
-
-
 <style>
-.add-country-btn,.add-day-btn,.add-time-btn{
-background:#b8924a;color:#fff;border:none;border-radius:4px;
-padding:8px 12px;margin-top:10px;cursor:pointer;font-weight:600;
+.item-delete-btn{
+  float:right;
+  margin-left:8px;
+  border:none;
+  background:transparent;
+  cursor:pointer;
+  font-size:16px;
 }
+.add-country-btn,.add-day-btn,.add-time-btn{
+  background:#b8924a;
+  color:#fff;
+  border:none;
+  border-radius:4px;
+  padding:8px 12px;
+  margin-top:10px;
+  cursor:pointer;
+  font-weight:600;
+}
+.sync-status{
+  position:fixed;
+  bottom:86px;
+  right:20px;
+  z-index:901;
+  background:rgba(14,14,14,.85);
+  color:#fff;
+  border:1px solid rgba(184,146,74,.35);
+  border-radius:4px;
+  padding:.55rem .75rem;
+  font-size:.65rem;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  opacity:0;
+  transform:translateY(6px);
+  transition:opacity .2s,transform .2s;
+  pointer-events:none;
+}
+.sync-status.on{opacity:1;transform:none}
+@media (max-width: 768px){.sync-status{left:15px;right:15px;bottom:76px;text-align:center}}
 </style>
 
-<script>
-document.addEventListener('DOMContentLoaded',()=>{
+<div id="sync-status" class="sync-status" aria-live="polite"></div>
 
-const countryAliases={
- portugal:"PT", brasil:"BR", brazil:"BR", espanha:"ES", spain:"ES",
- italia:"IT", italy:"IT", franca:"FR", france:"FR", "frança":"FR",
- alemanha:"DE", germany:"DE", austria:"AT", "áustria":"AT",
- belgica:"BE", "bélgica":"BE", belgium:"BE",
- holanda:"NL", netherlands:"NL", "países baixos":"NL",
- suica:"CH", "suíça":"CH", switzerland:"CH",
- "reino unido":"GB", "united kingdom":"GB", uk:"GB",
- inglaterra:"GB", england:"GB",
- irlanda:"IE", ireland:"IE",
- polonia:"PL", "polônia":"PL", poland:"PL",
- "republica tcheca":"CZ", "república tcheca":"CZ",
- "czech republic":"CZ", czechia:"CZ",
- grecia:"GR", "grécia":"GR", greece:"GR",
- turquia:"TR", turkey:"TR",
- japao:"JP", "japão":"JP", japan:"JP",
- china:"CN",
- "estados unidos":"US", usa:"US", "united states":"US",
- "united states of america":"US",
- canada:"CA", "canadá":"CA"
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCIXNefcrFxk7_RLHe7DTbtWQW9nczhia8",
+  authDomain: "roteiro-903e8.firebaseapp.com",
+  databaseURL: "https://roteiro-903e8-default-rtdb.firebaseio.com",
+  projectId: "roteiro-903e8",
+  storageBucket: "roteiro-903e8.firebasestorage.app",
+  messagingSenderId: "852917930194",
+  appId: "1:852917930194:web:10621af8e66545b51b850b"
 };
 
-function countryCodeToFlag(code){
- return [...code.toUpperCase()].map(c=>String.fromCodePoint(127397+c.charCodeAt())).join('');
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const pageRef = ref(db, "viagem/pageState");
+const clientId = getClientId();
+const editableSelectors = [
+  ".hero-eyebrow", ".hero-title", ".hero-sub", ".chip", ".dest-city", ".dest-when", ".dest-nights",
+  ".country-nm", ".country-cities", ".day-wd", ".day-n", ".day-mo", ".day-t", ".day-loc", ".tag",
+  ".si-t", ".si-a strong", ".si-a small", ".cl-txt", ".tip-ttl", ".tip-ul li", ".ft-brand", ".ft-meta", ".s-title", ".s-label"
+];
+
+let applyingRemote = false;
+let firebaseLoaded = false;
+let saveTimer = null;
+let statusTimer = null;
+
+function getClientId(){
+  try{
+    const key = "roteiroClientId";
+    const existing = localStorage.getItem(key);
+    if(existing) return existing;
+    const created = crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2);
+    localStorage.setItem(key, created);
+    return created;
+  }catch(_){
+    return String(Date.now()) + Math.random().toString(16).slice(2);
+  }
 }
-function getCountryFlag(name){
- const code=countryAliases[name.trim().toLowerCase()];
- return code ? countryCodeToFlag(code) : "🏳️";
+
+function showStatus(message, ok = true){
+  const el = document.getElementById("sync-status");
+  if(!el) return;
+  el.textContent = message;
+  el.style.borderColor = ok ? "rgba(184,146,74,.35)" : "rgba(139,58,42,.8)";
+  el.classList.add("on");
+  clearTimeout(statusTimer);
+  statusTimer = setTimeout(() => el.classList.remove("on"), 1800);
+}
+
+function sanitizeHtml(html){
+  const tpl = document.createElement("template");
+  tpl.innerHTML = html || "";
+  tpl.content.querySelectorAll("script,style,iframe,object,embed,link,meta").forEach(el => el.remove());
+  tpl.content.querySelectorAll("*").forEach(el => {
+    [...el.attributes].forEach(attr => {
+      if(attr.name.toLowerCase().startsWith("on")) el.removeAttribute(attr.name);
+    });
+  });
+  return tpl.innerHTML;
+}
+
+function hasVisibleText(html){
+  if(typeof html !== "string") return false;
+  const tpl = document.createElement("template");
+  tpl.innerHTML = sanitizeHtml(html);
+  return tpl.content.textContent.trim().length > 0;
+}
+
+function hasMeaningfulContent(content){
+  if(!content || typeof content !== "object") return false;
+  return Object.values(content).some(value => hasVisibleText(value));
+}
+
+function applyEditableIds(){
+  let idx = 0;
+  document.querySelectorAll(editableSelectors.join(",")).forEach(el => {
+    el.setAttribute("contenteditable", "true");
+    el.dataset.editableApplied = "1";
+    el.dataset.editId = "txt_" + idx++;
+  });
+}
+
+function collectEditableContent(){
+  applyEditableIds();
+  const content = {};
+  document.querySelectorAll("[data-edit-id]").forEach(el => {
+    if(el.closest("#roteiro")) return;
+    content[el.dataset.editId] = el.innerHTML;
+  });
+  return content;
+}
+
+function applyEditableContent(content){
+  if(!hasMeaningfulContent(content)) return;
+  applyEditableIds();
+  document.querySelectorAll("[data-edit-id]").forEach(el => {
+    if(el.closest("#roteiro")) return;
+    const value = content[el.dataset.editId];
+    if(typeof value === "string" && hasVisibleText(value) && el.innerHTML !== value) el.innerHTML = sanitizeHtml(value);
+  });
+}
+
+function removeEditorControls(root = document){
+  root.querySelectorAll(".add-country-btn,.add-day-btn,.add-time-btn,.item-delete-btn").forEach(el => el.remove());
+}
+
+function collectRoteiroHtml(){
+  const wrap = document.querySelector("#roteiro .wrap");
+  if(!wrap) return "";
+  const clone = wrap.cloneNode(true);
+  removeEditorControls(clone);
+  clone.querySelectorAll(".country-block").forEach(block => block.classList.add("fi", "v"));
+  clone.querySelectorAll(".day-card").forEach(card => card.setAttribute("onclick", "tog(this)"));
+  return [...clone.querySelectorAll(".country-block")].map(block => block.outerHTML).join("\n");
+}
+
+function applyRoteiroHtml(html){
+  if(!hasVisibleText(html)) return;
+  const wrap = document.querySelector("#roteiro .wrap");
+  if(!wrap) return;
+  wrap.querySelectorAll(".country-block").forEach(block => block.remove());
+
+  const tpl = document.createElement("template");
+  tpl.innerHTML = sanitizeHtml(html);
+  const insertBefore = wrap.querySelector(".add-country-btn") || null;
+  tpl.content.querySelectorAll(".country-block").forEach(block => wrap.insertBefore(block, insertBefore));
+  enhanceItineraryControls();
+  applyEditableIds();
+}
+
+function getChecklistState(){
+  return [...document.querySelectorAll(".cl-item")].map(item => Boolean(item.querySelector("input").checked));
+}
+
+function applyChecklistState(state){
+  if(!Array.isArray(state)) return;
+  const items = document.querySelectorAll(".cl-item");
+  state.forEach((checked, idx) => {
+    const item = items[idx];
+    const input = item.querySelector("input");
+    if(!item || !input) return;
+    input.checked = Boolean(checked);
+    item.classList.toggle("done", Boolean(checked));
+  });
+}
+
+function collectPageState(){
+  return {
+    schemaVersion: 2,
+    updatedAt: Date.now(),
+    updatedBy: clientId,
+    checklist: getChecklistState(),
+    content: collectEditableContent(),
+    roteiroHtml: collectRoteiroHtml()
+  };
+}
+
+async function savePageState({feedback = true} = {}){
+  if(applyingRemote || !firebaseLoaded) return;
+  const btn = document.querySelector(".btn-save");
+  const original = btn.innerHTML;
+  try{
+    if(feedback && btn) btn.innerHTML = "Salvando...";
+    await set(pageRef, collectPageState());
+    if(feedback && btn){
+      btn.style.background = "#3d6b5c";
+      btn.style.color = "#fff";
+      btn.innerHTML = "Salvo na Nuvem";
+      setTimeout(() => {
+        btn.style.background = "";
+        btn.style.color = "";
+        btn.innerHTML = original;
+      }, 1600);
+    }else{
+      showStatus("Sincronizado");
+    }
+  }catch(error){
+    console.error("Erro ao salvar no Firebase:", error);
+    showStatus("Erro ao salvar", false);
+    if(feedback) alert("Erro ao conectar com o Firebase Realtime Database.");
+    if(feedback && btn && original) btn.innerHTML = original;
+  }
+}
+
+function scheduleSave(){
+  if(applyingRemote || !firebaseLoaded) return;
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => savePageState({feedback:false}), 900);
 }
 
 function addTimeButton(sched){
- if(sched.querySelector('.add-time-btn')) return;
-
- const btn=document.createElement('button');
- btn.className='add-time-btn';
- btn.textContent='+ Adicionar Horário';
-
- btn.onclick=(e)=>{
-  e.stopPropagation();
-  const row=document.createElement('div');
-  row.className='si';
-  row.innerHTML=`
-   <span class="si-t" contenteditable="true">00:00</span>
-   <div class="si-a">
-    <strong contenteditable="true">Novo Evento</strong>
-    <small contenteditable="true">Descrição</small>
-   </div>`;
-  sched.insertBefore(row,btn);
- };
-
- sched.appendChild(btn);
+  if(!sched || sched.querySelector(":scope > .add-time-btn")) return;
+  const btn = document.createElement("button");
+  btn.className = "add-time-btn";
+  btn.type = "button";
+  btn.textContent = "+ Adicionar Horario";
+  btn.addEventListener("click", e => {
+    e.stopPropagation();
+    const row = document.createElement("div");
+    row.className = "si";
+    row.innerHTML = `<span class="si-t" contenteditable="true">00:00</span><div class="si-a"><strong contenteditable="true">Novo Evento</strong><small contenteditable="true">Descricao</small></div>`;
+    sched.insertBefore(row, btn);
+    enhanceItineraryControls();
+    scheduleSave();
+  });
+  sched.appendChild(btn);
 }
 
 function addDayButton(timeline){
- if(timeline.querySelector(':scope > .add-day-btn')) return;
-
- const btn=document.createElement('button');
- btn.className='add-day-btn';
- btn.textContent='+ Adicionar Dia';
-
- btn.onclick=(e)=>{
-  e.stopPropagation();
-
-  const card=document.createElement('div');
-  card.className='day-card';
-  card.onclick=function(){tog(this)};
-  card.innerHTML=`
-  <div class="day-date">
-   <div class="day-wd" contenteditable="true">Seg</div>
-   <div class="day-n" contenteditable="true">01</div>
-   <div class="day-mo" contenteditable="true">Jan</div>
-  </div>
-  <div class="day-body">
-   <div class="day-top">
-    <div>
-      <div class="day-t" contenteditable="true">Novo Dia</div>
-      <div class="day-loc" contenteditable="true">Localização</div>
-    </div>
-   </div>
-   <div class="day-detail" style="display:block">
-    <div class="sched"></div>
-   </div>
-  </div>`;
-
-  timeline.insertBefore(card,btn);
-  addTimeButton(card.querySelector('.sched'));
- };
-
- timeline.appendChild(btn);
+  if(!timeline || timeline.querySelector(":scope > .add-day-btn")) return;
+  const btn = document.createElement("button");
+  btn.className = "add-day-btn";
+  btn.type = "button";
+  btn.textContent = "+ Adicionar Dia";
+  btn.addEventListener("click", e => {
+    e.stopPropagation();
+    const card = document.createElement("div");
+    card.className = "day-card open";
+    card.setAttribute("onclick", "tog(this)");
+    card.innerHTML = `<div class="day-date"><div class="day-wd" contenteditable="true">Seg</div><div class="day-n" contenteditable="true">01</div><div class="day-mo" contenteditable="true">Jan</div></div><div class="day-body"><div class="day-top"><div><div class="day-t" contenteditable="true">Novo Dia</div><div class="day-loc" contenteditable="true">Localizacao</div></div><svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></div><div class="day-tags"></div><div class="day-detail"><div class="sched"></div></div></div>`;
+    timeline.insertBefore(card, btn);
+    enhanceItineraryControls();
+    scheduleSave();
+  });
+  timeline.appendChild(btn);
 }
 
-document.querySelectorAll('.sched').forEach(addTimeButton);
-document.querySelectorAll('.timeline').forEach(addDayButton);
-
-const roteiroWrap=document.querySelector('#roteiro .wrap');
-
-const countryBtn=document.createElement('button');
-countryBtn.className='add-country-btn';
-countryBtn.textContent='+ Adicionar País';
-
-countryBtn.onclick=()=>{
- const country=prompt('Nome do país:');
- if(!country) return;
-
- const flag=getCountryFlag(country);
-
- const block=document.createElement('div');
- block.className='country-block';
- block.innerHTML=`
- <div class="country-head">
-  <span class="country-flag">${flag}</span>
-  <div>
-   <div class="country-nm" contenteditable="true">${country}</div>
-   <div class="country-cities" contenteditable="true">Cidades</div>
-  </div>
- </div>
- <div class="timeline"></div>`;
-
- roteiroWrap.appendChild(block);
- addDayButton(block.querySelector('.timeline'));
-};
-
-roteiroWrap.appendChild(countryBtn);
-
-});
-</script>
-
-
-<style>
-.item-delete-btn{
-float:right;
-margin-left:8px;
-border:none;
-background:transparent;
-cursor:pointer;
-font-size:16px;
-}
-</style>
-<script>
-document.addEventListener('DOMContentLoaded',()=>{
-
-function addTrashToCountries(){
- document.querySelectorAll('.country-head').forEach(head=>{
-   if(head.querySelector('.item-delete-btn')) return;
-   const b=document.createElement('button');
-   b.className='item-delete-btn';
-   b.innerHTML='🗑️';
-   b.onclick=(e)=>{e.stopPropagation(); head.closest('.country-block')?.remove();};
-   head.appendChild(b);
- });
+function countryCodeToFlag(code){
+  return [...code.toUpperCase()].map(c => String.fromCodePoint(127397 + c.charCodeAt())).join("");
 }
 
-function addTrashToDays(){
- document.querySelectorAll('.day-card').forEach(card=>{
-   if(card.querySelector('.item-delete-btn.day-trash')) return;
-   const top=card.querySelector('.day-top') || card.querySelector('.day-body') || card;
-   const b=document.createElement('button');
-   b.className='item-delete-btn day-trash';
-   b.innerHTML='🗑️';
-   b.onclick=(e)=>{e.stopPropagation(); card.remove();};
-   top.appendChild(b);
- });
+function getCountryFlag(name){
+  const aliases = {
+    portugal:"PT", brasil:"BR", brazil:"BR", espanha:"ES", spain:"ES", italia:"IT", italy:"IT", franca:"FR", france:"FR",
+    alemanha:"DE", germany:"DE", austria:"AT", belgica:"BE", belgium:"BE", holanda:"NL", netherlands:"NL",
+    suica:"CH", switzerland:"CH", "reino unido":"GB", uk:"GB", inglaterra:"GB", england:"GB", irlanda:"IE", ireland:"IE",
+    polonia:"PL", poland:"PL", "czech republic":"CZ", czechia:"CZ", grecia:"GR", greece:"GR", turquia:"TR", turkey:"TR",
+    japao:"JP", japan:"JP", china:"CN", "estados unidos":"US", usa:"US", canada:"CA"
+  };
+  const normalized = name.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  const code = aliases[normalized];
+  return code ? countryCodeToFlag(code) : "";
 }
 
-function addTrashToTimes(){
- document.querySelectorAll('.si').forEach(row=>{
-   if(row.querySelector('.item-delete-btn')) return;
-   const b=document.createElement('button');
-   b.className='item-delete-btn';
-   b.innerHTML='🗑️';
-   b.onclick=(e)=>{e.stopPropagation(); row.remove();};
-   row.appendChild(b);
- });
+function addCountryButton(){
+  const wrap = document.querySelector("#roteiro .wrap");
+  if(!wrap || wrap.querySelector(":scope > .add-country-btn")) return;
+  const btn = document.createElement("button");
+  btn.className = "add-country-btn";
+  btn.type = "button";
+  btn.textContent = "+ Adicionar Pais";
+  btn.addEventListener("click", () => {
+    const country = prompt("Nome do pais:");
+    if(!country) return;
+    const block = document.createElement("div");
+    block.className = "country-block fi v";
+    block.innerHTML = `<div class="country-head"><span class="country-flag">${getCountryFlag(country)}</span><div><div class="country-nm" contenteditable="true">${country}</div><div class="country-cities" contenteditable="true">Cidades</div></div></div><div class="timeline"></div>`;
+    wrap.insertBefore(block, btn);
+    enhanceItineraryControls();
+    scheduleSave();
+  });
+  wrap.appendChild(btn);
 }
 
-const obs=new MutationObserver(()=>{
- addTrashToCountries();
- addTrashToDays();
- addTrashToTimes();
-});
-obs.observe(document.body,{childList:true,subtree:true});
-
-addTrashToCountries();
-addTrashToDays();
-addTrashToTimes();
-
-document.querySelectorAll('.delete-btn').forEach(x=>x.remove());
-});
-</script>
-
-
-<script>
-document.addEventListener('DOMContentLoaded',()=>{
-  const observer = new MutationObserver(()=>{
-    document.querySelectorAll('.country-block .timeline').forEach(timeline=>{
-      if(timeline.querySelector(':scope > .add-day-btn')) return;
-
-      const dayBtn=document.createElement('button');
-      dayBtn.className='add-day-btn';
-      dayBtn.textContent='+ Adicionar Dia';
-
-      dayBtn.onclick=(e)=>{
-        e.stopPropagation();
-
-        const card=document.createElement('div');
-        card.className='day-card';
-        card.innerHTML=`
-          <div class="day-date">
-            <div class="day-wd" contenteditable="true">Seg</div>
-            <div class="day-n" contenteditable="true">01</div>
-            <div class="day-mo" contenteditable="true">Jan</div>
-          </div>
-          <div class="day-body">
-            <div class="day-top">
-              <div>
-                <div class="day-t" contenteditable="true">Novo Dia</div>
-                <div class="day-loc" contenteditable="true">Localização</div>
-              </div>
-            </div>
-            <div class="day-detail" style="display:block">
-              <div class="sched"></div>
-            </div>
-          </div>`;
-
-        timeline.insertBefore(card, dayBtn);
-
-        const sched = card.querySelector('.sched');
-        const timeBtn=document.createElement('button');
-        timeBtn.className='add-time-btn';
-        timeBtn.textContent='+ Adicionar Horário';
-
-        timeBtn.onclick=(ev)=>{
-          ev.stopPropagation();
-          const row=document.createElement('div');
-          row.className='si';
-          row.innerHTML=`
-            <span class="si-t" contenteditable="true">00:00</span>
-            <div class="si-a">
-              <strong contenteditable="true">Novo Evento</strong>
-              <small contenteditable="true">Descrição</small>
-            </div>`;
-          sched.insertBefore(row,timeBtn);
-        };
-
-        sched.appendChild(timeBtn);
-      };
-
-      timeline.appendChild(dayBtn);
+function addDeleteButtons(){
+  document.querySelectorAll(".country-head").forEach(head => {
+    if(head.querySelector(":scope > .item-delete-btn")) return;
+    const btn = document.createElement("button");
+    btn.className = "item-delete-btn";
+    btn.type = "button";
+    btn.textContent = "Excluir";
+    btn.addEventListener("click", e => {
+      e.stopPropagation();
+      head.closest(".country-block")?.remove();
+      scheduleSave();
     });
+    head.appendChild(btn);
   });
-
-  observer.observe(document.body,{childList:true,subtree:true});
-});
-</script>
-
-
-<script>
-document.addEventListener('DOMContentLoaded',()=>{
-
-  // Prevent card toggle when editing text
-  document.addEventListener('click', function(e){
-
-    if(
-      e.target.closest('[contenteditable="true"]') ||
-      e.target.matches('[contenteditable="true"]')
-    ){
+  document.querySelectorAll(".day-card").forEach(card => {
+    if(card.querySelector(".item-delete-btn.day-trash")) return;
+    const top = card.querySelector(".day-top") || card.querySelector(".day-body") || card;
+    const btn = document.createElement("button");
+    btn.className = "item-delete-btn day-trash";
+    btn.type = "button";
+    btn.textContent = "Excluir";
+    btn.addEventListener("click", e => {
       e.stopPropagation();
-    }
-
-  }, true);
-
-  document.addEventListener('mousedown', function(e){
-
-    if(
-      e.target.closest('[contenteditable="true"]') ||
-      e.target.matches('[contenteditable="true"]')
-    ){
-      e.stopPropagation();
-    }
-
-  }, true);
-
-  document.querySelectorAll('[contenteditable="true"]').forEach(el=>{
-    el.addEventListener('click', e=>{
-      e.stopPropagation();
+      card.remove();
+      scheduleSave();
     });
+    top.appendChild(btn);
   });
-
-});
-</script>
-
-
-<script>
-document.addEventListener('DOMContentLoaded',()=>{
-
-function collectEditableData(){
-  const data = {};
-  document.querySelectorAll('[contenteditable="true"]').forEach((el,i)=>{
-    if(!el.dataset.firebaseKey){
-      el.dataset.firebaseKey = 'editable_' + i;
-    }
-    data[el.dataset.firebaseKey] = el.innerHTML;
-  });
-  return data;
-}
-
-const saveBtn = Array.from(document.querySelectorAll('button'))
-  .find(b => b.textContent && b.textContent.includes('Salvar'));
-
-if(saveBtn){
-  saveBtn.addEventListener('click', async ()=>{
-    try{
-      const data = collectEditableData();
-
-      if(window.firebaseDB && window.firebaseRef && window.firebaseSet){
-        await window.firebaseSet(
-          window.firebaseRef(window.firebaseDB, 'sharedContent'),
-          data
-        );
-        console.log('Saved to Firebase');
-      }else{
-        console.warn('Firebase globals not found');
-      }
-    }catch(err){
-      console.error(err);
-    }
+  document.querySelectorAll(".si").forEach(row => {
+    if(row.querySelector(":scope > .item-delete-btn")) return;
+    const btn = document.createElement("button");
+    btn.className = "item-delete-btn";
+    btn.type = "button";
+    btn.textContent = "Excluir";
+    btn.addEventListener("click", e => {
+      e.stopPropagation();
+      row.remove();
+      scheduleSave();
+    });
+    row.appendChild(btn);
   });
 }
 
-async function loadSharedContent(){
+function enhanceItineraryControls(){
+  removeEditorControls();
+  document.querySelectorAll(".day-card").forEach(card => card.setAttribute("onclick", "tog(this)"));
+  document.querySelectorAll(".sched").forEach(addTimeButton);
+  document.querySelectorAll(".timeline").forEach(addDayButton);
+  addCountryButton();
+  addDeleteButtons();
+  applyEditableIds();
+}
+
+function setupUi(){
+  window.tog = function(card){ card.classList.toggle("open"); };
+  window.setMap = function(btn, q){
+    document.querySelectorAll(".mb").forEach(b => b.classList.remove("on"));
+    btn.classList.add("on");
+    document.getElementById("map-iframe").src = "https://maps.google.com/maps?q=" + encodeURIComponent(q) + "&z=14&output=embed";
+  };
+  window.chk = function(item){
+    if(applyingRemote) return;
+    const cb = item.querySelector("input");
+    if(!cb) return;
+    cb.checked = !cb.checked;
+    item.classList.toggle("done", cb.checked);
+    scheduleSave();
+  };
+  window.salvarAlteracoes = () => savePageState({feedback:true});
+
+  window.addEventListener("scroll", () => {
+    const h = document.documentElement;
+    const pct = h.scrollTop / (h.scrollHeight - h.clientHeight) * 100;
+    document.getElementById("prog").style.width = pct + "%";
+  });
+
+  const links = document.querySelectorAll(".nav-links a");
+  const sectionObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if(!entry.isIntersecting) return;
+      links.forEach(link => link.classList.remove("on"));
+      document.querySelector(`.nav-links a[href="#${entry.target.id}"]`)?.classList.add("on");
+    });
+  }, {rootMargin:"-40% 0px -55% 0px"});
+  document.querySelectorAll("section").forEach(section => sectionObserver.observe(section));
+
+  const fadeObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => { if(entry.isIntersecting) entry.target.classList.add("v"); });
+  }, {threshold:.08});
+  document.querySelectorAll(".fi").forEach(el => fadeObserver.observe(el));
+
+  document.addEventListener("click", e => {
+    if(e.target.closest("[contenteditable='true']")) e.stopPropagation();
+  }, true);
+  document.addEventListener("mousedown", e => {
+    if(e.target.closest("[contenteditable='true']")) e.stopPropagation();
+  }, true);
+  document.addEventListener("input", e => {
+    if(e.target.closest("[contenteditable='true']")) scheduleSave();
+  });
+}
+
+function applyRemoteState(data){
+  if(!data || data.updatedBy === clientId) return;
+  const hasRemoteText = hasMeaningfulContent(data.content) || hasVisibleText(data.roteiroHtml);
+  if(!hasRemoteText){
+    showStatus("Estado vazio ignorado", false);
+    return;
+  }
+  applyingRemote = true;
+  clearTimeout(saveTimer);
   try{
-    if(window.firebaseDB && window.firebaseRef && window.firebaseGet){
-      const snap = await window.firebaseGet(
-        window.firebaseRef(window.firebaseDB, 'sharedContent')
-      );
-
-      if(snap.exists()){
-        const data = snap.val();
-        document.querySelectorAll('[contenteditable="true"]').forEach((el,i)=>{
-          const key = 'editable_' + i;
-          el.dataset.firebaseKey = key;
-          if(data[key] !== undefined){
-            el.innerHTML = data[key];
-          }
-        });
-      }
-    }
-  }catch(err){
-    console.error(err);
+    applyRoteiroHtml(data.roteiroHtml);
+    applyEditableContent(data.content);
+    applyChecklistState(data.checklist);
+    showStatus("Atualizado da nuvem");
+  }finally{
+    applyingRemote = false;
   }
 }
 
-loadSharedContent();
+document.addEventListener("DOMContentLoaded", () => {
+  setupUi();
+  enhanceItineraryControls();
+  applyEditableIds();
 
+  onValue(pageRef, snapshot => {
+    const data = snapshot.val();
+    firebaseLoaded = true;
+    applyRemoteState(data);
+  }, error => {
+    firebaseLoaded = true;
+    console.error("Erro ao ouvir Firebase:", error);
+    showStatus("Firebase offline", false);
+  });
 });
 </script>
-
 </body>
 </html>
