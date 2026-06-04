@@ -256,6 +256,10 @@ footer{background:#07101a;padding:2.8rem 5vw 6.5rem 5vw;display:flex;align-items
   .save-btn-container { left: 0; right: 0; bottom: 0; padding: 10px 15px; background: rgba(14,14,14,0.85); backdrop-filter: blur(10px); box-shadow: 0 -4px 15px rgba(0,0,0,0.15); }
   .btn-save { width: 100%; justify-content: center; padding: 0.9rem; }
 }
+
+[contenteditable="true"]{outline:2px dashed transparent}
+[contenteditable="true"]:focus{outline:2px dashed #b8924a}
+
 </style>
 </head>
 <body>
@@ -456,6 +460,9 @@ footer{background:#07101a;padding:2.8rem 5vw 6.5rem 5vw;display:flex;align-items
   // Inicializando o Firebase
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
+window.firebaseDB=db;
+window.firebaseRef=ref;
+window.firebaseSet=set;
   const checklistRef = ref(db, 'viagem/checklist');
 
   // Variável para travar cliques duplos durante a sincronização inicial
@@ -548,5 +555,345 @@ function setMap(btn, q){
   document.getElementById('map-iframe').src = 'https://maps.google.com/maps?q='+encodeURIComponent(q)+'&z=14&output=embed';
 }
 </script>
+
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  const selectors=[
+    '.hero-eyebrow','.hero-title','.hero-sub','.chip','.dest-city','.dest-when','.dest-nights',
+    '.country-nm','.country-cities','.day-t','.day-loc','.tag','.si-a strong','.si-a small',
+    '.cl-txt','.tip-ttl','.tip-ul li','.ft-brand','.ft-meta','.s-title','.s-label'
+  ];
+
+  let idx=0;
+  document.querySelectorAll(selectors.join(',')).forEach(el=>{
+    if(el.dataset.editableApplied) return;
+    el.dataset.editableApplied='1';
+    el.setAttribute('contenteditable','true');
+    el.dataset.editId='txt_'+(idx++);
+  });
+
+  const contentRef = window.firebaseContentRef || null;
+
+  if(window.salvarAlteracoes){
+    const oldSave=window.salvarAlteracoes;
+    window.salvarAlteracoes=function(){
+      const texts={};
+      document.querySelectorAll('[data-edit-id]').forEach(el=>{
+        texts[el.dataset.editId]=el.innerHTML;
+      });
+
+      if(window.firebaseDB && window.firebaseSet && window.firebaseRef){
+        const r=window.firebaseRef(window.firebaseDB,'viagem/content');
+        window.firebaseSet(r,texts).catch(console.error);
+      }
+
+      oldSave();
+    }
+  }
+});
+</script>
+
+
+<style>
+.add-country-btn,.add-day-btn,.add-time-btn{
+background:#b8924a;color:#fff;border:none;border-radius:4px;
+padding:8px 12px;margin-top:10px;cursor:pointer;font-weight:600;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+
+const countryAliases={
+ portugal:"PT", brasil:"BR", brazil:"BR", espanha:"ES", spain:"ES",
+ italia:"IT", italy:"IT", franca:"FR", france:"FR", "frança":"FR",
+ alemanha:"DE", germany:"DE", austria:"AT", "áustria":"AT",
+ belgica:"BE", "bélgica":"BE", belgium:"BE",
+ holanda:"NL", netherlands:"NL", "países baixos":"NL",
+ suica:"CH", "suíça":"CH", switzerland:"CH",
+ "reino unido":"GB", "united kingdom":"GB", uk:"GB",
+ inglaterra:"GB", england:"GB",
+ irlanda:"IE", ireland:"IE",
+ polonia:"PL", "polônia":"PL", poland:"PL",
+ "republica tcheca":"CZ", "república tcheca":"CZ",
+ "czech republic":"CZ", czechia:"CZ",
+ grecia:"GR", "grécia":"GR", greece:"GR",
+ turquia:"TR", turkey:"TR",
+ japao:"JP", "japão":"JP", japan:"JP",
+ china:"CN",
+ "estados unidos":"US", usa:"US", "united states":"US",
+ "united states of america":"US",
+ canada:"CA", "canadá":"CA"
+};
+
+function countryCodeToFlag(code){
+ return [...code.toUpperCase()].map(c=>String.fromCodePoint(127397+c.charCodeAt())).join('');
+}
+function getCountryFlag(name){
+ const code=countryAliases[name.trim().toLowerCase()];
+ return code ? countryCodeToFlag(code) : "🏳️";
+}
+
+function addTimeButton(sched){
+ if(sched.querySelector('.add-time-btn')) return;
+
+ const btn=document.createElement('button');
+ btn.className='add-time-btn';
+ btn.textContent='+ Adicionar Horário';
+
+ btn.onclick=(e)=>{
+  e.stopPropagation();
+  const row=document.createElement('div');
+  row.className='si';
+  row.innerHTML=`
+   <span class="si-t" contenteditable="true">00:00</span>
+   <div class="si-a">
+    <strong contenteditable="true">Novo Evento</strong>
+    <small contenteditable="true">Descrição</small>
+   </div>`;
+  sched.insertBefore(row,btn);
+ };
+
+ sched.appendChild(btn);
+}
+
+function addDayButton(timeline){
+ if(timeline.querySelector(':scope > .add-day-btn')) return;
+
+ const btn=document.createElement('button');
+ btn.className='add-day-btn';
+ btn.textContent='+ Adicionar Dia';
+
+ btn.onclick=(e)=>{
+  e.stopPropagation();
+
+  const card=document.createElement('div');
+  card.className='day-card';
+  card.onclick=function(){tog(this)};
+  card.innerHTML=`
+  <div class="day-date">
+   <div class="day-wd" contenteditable="true">Seg</div>
+   <div class="day-n" contenteditable="true">01</div>
+   <div class="day-mo" contenteditable="true">Jan</div>
+  </div>
+  <div class="day-body">
+   <div class="day-top">
+    <div>
+      <div class="day-t" contenteditable="true">Novo Dia</div>
+      <div class="day-loc" contenteditable="true">Localização</div>
+    </div>
+   </div>
+   <div class="day-detail" style="display:block">
+    <div class="sched"></div>
+   </div>
+  </div>`;
+
+  timeline.insertBefore(card,btn);
+  addTimeButton(card.querySelector('.sched'));
+ };
+
+ timeline.appendChild(btn);
+}
+
+document.querySelectorAll('.sched').forEach(addTimeButton);
+document.querySelectorAll('.timeline').forEach(addDayButton);
+
+const roteiroWrap=document.querySelector('#roteiro .wrap');
+
+const countryBtn=document.createElement('button');
+countryBtn.className='add-country-btn';
+countryBtn.textContent='+ Adicionar País';
+
+countryBtn.onclick=()=>{
+ const country=prompt('Nome do país:');
+ if(!country) return;
+
+ const flag=getCountryFlag(country);
+
+ const block=document.createElement('div');
+ block.className='country-block';
+ block.innerHTML=`
+ <div class="country-head">
+  <span class="country-flag">${flag}</span>
+  <div>
+   <div class="country-nm" contenteditable="true">${country}</div>
+   <div class="country-cities" contenteditable="true">Cidades</div>
+  </div>
+ </div>
+ <div class="timeline"></div>`;
+
+ roteiroWrap.appendChild(block);
+ addDayButton(block.querySelector('.timeline'));
+};
+
+roteiroWrap.appendChild(countryBtn);
+
+});
+</script>
+
+
+<style>
+.item-delete-btn{
+float:right;
+margin-left:8px;
+border:none;
+background:transparent;
+cursor:pointer;
+font-size:16px;
+}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+
+function addTrashToCountries(){
+ document.querySelectorAll('.country-head').forEach(head=>{
+   if(head.querySelector('.item-delete-btn')) return;
+   const b=document.createElement('button');
+   b.className='item-delete-btn';
+   b.innerHTML='🗑️';
+   b.onclick=(e)=>{e.stopPropagation(); head.closest('.country-block')?.remove();};
+   head.appendChild(b);
+ });
+}
+
+function addTrashToDays(){
+ document.querySelectorAll('.day-card').forEach(card=>{
+   if(card.querySelector('.item-delete-btn.day-trash')) return;
+   const top=card.querySelector('.day-top') || card.querySelector('.day-body') || card;
+   const b=document.createElement('button');
+   b.className='item-delete-btn day-trash';
+   b.innerHTML='🗑️';
+   b.onclick=(e)=>{e.stopPropagation(); card.remove();};
+   top.appendChild(b);
+ });
+}
+
+function addTrashToTimes(){
+ document.querySelectorAll('.si').forEach(row=>{
+   if(row.querySelector('.item-delete-btn')) return;
+   const b=document.createElement('button');
+   b.className='item-delete-btn';
+   b.innerHTML='🗑️';
+   b.onclick=(e)=>{e.stopPropagation(); row.remove();};
+   row.appendChild(b);
+ });
+}
+
+const obs=new MutationObserver(()=>{
+ addTrashToCountries();
+ addTrashToDays();
+ addTrashToTimes();
+});
+obs.observe(document.body,{childList:true,subtree:true});
+
+addTrashToCountries();
+addTrashToDays();
+addTrashToTimes();
+
+document.querySelectorAll('.delete-btn').forEach(x=>x.remove());
+});
+</script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  const observer = new MutationObserver(()=>{
+    document.querySelectorAll('.country-block .timeline').forEach(timeline=>{
+      if(timeline.querySelector(':scope > .add-day-btn')) return;
+
+      const dayBtn=document.createElement('button');
+      dayBtn.className='add-day-btn';
+      dayBtn.textContent='+ Adicionar Dia';
+
+      dayBtn.onclick=(e)=>{
+        e.stopPropagation();
+
+        const card=document.createElement('div');
+        card.className='day-card';
+        card.innerHTML=`
+          <div class="day-date">
+            <div class="day-wd" contenteditable="true">Seg</div>
+            <div class="day-n" contenteditable="true">01</div>
+            <div class="day-mo" contenteditable="true">Jan</div>
+          </div>
+          <div class="day-body">
+            <div class="day-top">
+              <div>
+                <div class="day-t" contenteditable="true">Novo Dia</div>
+                <div class="day-loc" contenteditable="true">Localização</div>
+              </div>
+            </div>
+            <div class="day-detail" style="display:block">
+              <div class="sched"></div>
+            </div>
+          </div>`;
+
+        timeline.insertBefore(card, dayBtn);
+
+        const sched = card.querySelector('.sched');
+        const timeBtn=document.createElement('button');
+        timeBtn.className='add-time-btn';
+        timeBtn.textContent='+ Adicionar Horário';
+
+        timeBtn.onclick=(ev)=>{
+          ev.stopPropagation();
+          const row=document.createElement('div');
+          row.className='si';
+          row.innerHTML=`
+            <span class="si-t" contenteditable="true">00:00</span>
+            <div class="si-a">
+              <strong contenteditable="true">Novo Evento</strong>
+              <small contenteditable="true">Descrição</small>
+            </div>`;
+          sched.insertBefore(row,timeBtn);
+        };
+
+        sched.appendChild(timeBtn);
+      };
+
+      timeline.appendChild(dayBtn);
+    });
+  });
+
+  observer.observe(document.body,{childList:true,subtree:true});
+});
+</script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+
+  // Prevent card toggle when editing text
+  document.addEventListener('click', function(e){
+
+    if(
+      e.target.closest('[contenteditable="true"]') ||
+      e.target.matches('[contenteditable="true"]')
+    ){
+      e.stopPropagation();
+    }
+
+  }, true);
+
+  document.addEventListener('mousedown', function(e){
+
+    if(
+      e.target.closest('[contenteditable="true"]') ||
+      e.target.matches('[contenteditable="true"]')
+    ){
+      e.stopPropagation();
+    }
+
+  }, true);
+
+  document.querySelectorAll('[contenteditable="true"]').forEach(el=>{
+    el.addEventListener('click', e=>{
+      e.stopPropagation();
+    });
+  });
+
+});
+</script>
+
 </body>
 </html>
