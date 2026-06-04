@@ -127,6 +127,8 @@ section{padding:5rem 0}
 .day-card:hover{border-color:var(--gold);box-shadow:0 3px 18px rgba(184,146,74,.12)}
 .day-card.open{border-color:var(--gold);box-shadow:0 4px 24px rgba(184,146,74,.15)}
 .day-date{background:var(--navy);padding:1.1rem .8rem;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;flex-shrink:0}
+.day-date .day-wd,.day-date .day-n,.day-date .day-mo{cursor:pointer;border-radius:2px;transition:background .15s,color .15s}
+.day-date .day-wd:hover,.day-date .day-n:hover,.day-date .day-mo:hover{background:rgba(212,169,106,.12)}
 .day-wd{font-size:.55rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold2);font-weight:600;margin-bottom:.25rem}
 .day-n{font-family:'Cormorant Garamond',serif;font-size:1.9rem;font-weight:400;color:#fff;line-height:1}
 .day-mo{font-size:.55rem;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.1em;margin-top:.15rem}
@@ -445,9 +447,26 @@ footer{background:#07101a;padding:2.8rem 5vw 6.5rem 5vw;display:flex;align-items
   float:right;
   margin-left:8px;
   border:none;
-  background:transparent;
+  background:#b8924a;
+  color:#fff;
   cursor:pointer;
-  font-size:16px;
+  width:28px;
+  height:28px;
+  border-radius:4px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:0;
+  transition:background .2s,transform .2s;
+}
+.item-delete-btn:hover{
+  background:#d4a96a;
+  transform:translateY(-1px);
+}
+.item-delete-btn svg{
+  width:15px;
+  height:15px;
+  display:block;
 }
 .add-country-btn,.add-day-btn,.add-time-btn{
   background:#b8924a;
@@ -478,10 +497,19 @@ footer{background:#07101a;padding:2.8rem 5vw 6.5rem 5vw;display:flex;align-items
   pointer-events:none;
 }
 .sync-status.on{opacity:1;transform:none}
+.day-date-picker{
+  position:fixed;
+  width:1px;
+  height:1px;
+  opacity:0;
+  pointer-events:none;
+  z-index:-1;
+}
 @media (max-width: 768px){.sync-status{left:15px;right:15px;bottom:76px;text-align:center}}
 </style>
 
 <div id="sync-status" class="sync-status" aria-live="polite"></div>
+<input id="day-date-picker" class="day-date-picker" type="date" aria-hidden="true" tabindex="-1">
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
@@ -503,7 +531,7 @@ const pageRef = ref(db, "viagem/pageState");
 const clientId = getClientId();
 const editableSelectors = [
   ".hero-eyebrow", ".hero-title", ".hero-sub", ".chip", ".dest-city", ".dest-when", ".dest-nights",
-  ".country-nm", ".country-cities", ".day-wd", ".day-n", ".day-mo", ".day-t", ".day-loc", ".tag",
+  ".country-nm", ".country-cities", ".day-t", ".day-loc", ".tag",
   ".si-t", ".si-a strong", ".si-a small", ".cl-txt", ".tip-ttl", ".tip-ul li", ".ft-brand", ".ft-meta", ".s-title", ".s-label"
 ];
 
@@ -511,6 +539,10 @@ let applyingRemote = false;
 let firebaseLoaded = false;
 let saveTimer = null;
 let statusTimer = null;
+let activeDateCard = null;
+
+const ptWeekdays = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sab"];
+const ptMonths = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
 
 function getClientId(){
   try{
@@ -616,6 +648,78 @@ function applyRoteiroHtml(html){
   applyEditableIds();
 }
 
+function getTripYear(){
+  const match = document.title.match(/\b20\d{2}\b/) || document.body.textContent.match(/\b20\d{2}\b/);
+  return match ? Number(match[0]) : new Date().getFullYear();
+}
+
+function formatDateForInput(date){
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, "0");
+  const dd = String(date.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+function parseCardDate(card){
+  if(card.dataset.date){
+    const savedDate = new Date(`${card.dataset.date}T00:00:00`);
+    if(!Number.isNaN(savedDate.getTime())) return savedDate;
+  }
+  const day = Number(card.querySelector(".day-n")?.textContent.trim());
+  const monthText = card.querySelector(".day-mo")?.textContent.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  const month = ptMonths.findIndex(name => name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") === monthText);
+  if(Number.isFinite(day) && day >= 1 && month >= 0) return new Date(getTripYear(), month, day);
+  return new Date(getTripYear(), 0, 1);
+}
+
+function applyDateToCard(card, value){
+  if(!card || !value) return;
+  const [year, month, day] = value.split("-").map(Number);
+  const date = new Date(year, month - 1, day);
+  if(Number.isNaN(date.getTime())) return;
+  const wd = card.querySelector(".day-wd");
+  const num = card.querySelector(".day-n");
+  const mo = card.querySelector(".day-mo");
+  if(wd) wd.textContent = ptWeekdays[date.getDay()];
+  if(num) num.textContent = String(date.getDate()).padStart(2, "0");
+  if(mo) mo.textContent = ptMonths[date.getMonth()];
+  card.dataset.date = value;
+  scheduleSave();
+}
+
+function setupDatePicker(){
+  const picker = document.getElementById("day-date-picker");
+  if(!picker) return;
+  picker.addEventListener("change", () => applyDateToCard(activeDateCard, picker.value));
+  document.addEventListener("click", e => {
+    const trigger = e.target.closest(".day-wd,.day-n,.day-mo");
+    if(!trigger) return;
+    const card = trigger.closest(".day-card");
+    if(!card) return;
+    e.preventDefault();
+    e.stopPropagation();
+    activeDateCard = card;
+    picker.value = formatDateForInput(parseCardDate(card));
+    const rect = trigger.getBoundingClientRect();
+    picker.style.left = `${Math.max(0, rect.left)}px`;
+    picker.style.top = `${Math.max(0, rect.bottom)}px`;
+    picker.focus({preventScroll:true});
+    if(typeof picker.showPicker === "function") picker.showPicker();
+    else picker.click();
+  }, true);
+}
+
+function setupDayDateControls(){
+  document.querySelectorAll(".day-date .day-wd,.day-date .day-n,.day-date .day-mo").forEach(el => {
+    el.removeAttribute("contenteditable");
+    el.removeAttribute("data-editable-applied");
+    el.removeAttribute("data-edit-id");
+    el.setAttribute("role", "button");
+    el.setAttribute("tabindex", "0");
+    el.setAttribute("title", "Escolher data");
+  });
+}
+
 function getChecklistState(){
   return [...document.querySelectorAll(".cl-item")].map(item => Boolean(item.querySelector("input").checked));
 }
@@ -705,7 +809,7 @@ function addDayButton(timeline){
     const card = document.createElement("div");
     card.className = "day-card open";
     card.setAttribute("onclick", "tog(this)");
-    card.innerHTML = `<div class="day-date"><div class="day-wd" contenteditable="true">Seg</div><div class="day-n" contenteditable="true">01</div><div class="day-mo" contenteditable="true">Jan</div></div><div class="day-body"><div class="day-top"><div><div class="day-t" contenteditable="true">Novo Dia</div><div class="day-loc" contenteditable="true">Localizacao</div></div><svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></div><div class="day-tags"></div><div class="day-detail"><div class="sched"></div></div></div>`;
+    card.innerHTML = `<div class="day-date"><div class="day-wd">Seg</div><div class="day-n">01</div><div class="day-mo">Jan</div></div><div class="day-body"><div class="day-top"><div><div class="day-t" contenteditable="true">Novo Dia</div><div class="day-loc" contenteditable="true">Localizacao</div></div><svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></div><div class="day-tags"></div><div class="day-detail"><div class="sched"></div></div></div>`;
     timeline.insertBefore(card, btn);
     enhanceItineraryControls();
     scheduleSave();
@@ -751,12 +855,17 @@ function addCountryButton(){
 }
 
 function addDeleteButtons(){
+  const setDeleteButtonIcon = btn => {
+    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path><path d="M10 11v5"></path><path d="M14 11v5"></path></svg>`;
+    btn.setAttribute("aria-label", "Excluir");
+    btn.setAttribute("title", "Excluir");
+  };
   document.querySelectorAll(".country-head").forEach(head => {
     if(head.querySelector(":scope > .item-delete-btn")) return;
     const btn = document.createElement("button");
     btn.className = "item-delete-btn";
     btn.type = "button";
-    btn.textContent = "Excluir";
+    setDeleteButtonIcon(btn);
     btn.addEventListener("click", e => {
       e.stopPropagation();
       head.closest(".country-block")?.remove();
@@ -770,7 +879,7 @@ function addDeleteButtons(){
     const btn = document.createElement("button");
     btn.className = "item-delete-btn day-trash";
     btn.type = "button";
-    btn.textContent = "Excluir";
+    setDeleteButtonIcon(btn);
     btn.addEventListener("click", e => {
       e.stopPropagation();
       card.remove();
@@ -783,7 +892,7 @@ function addDeleteButtons(){
     const btn = document.createElement("button");
     btn.className = "item-delete-btn";
     btn.type = "button";
-    btn.textContent = "Excluir";
+    setDeleteButtonIcon(btn);
     btn.addEventListener("click", e => {
       e.stopPropagation();
       row.remove();
@@ -801,6 +910,7 @@ function enhanceItineraryControls(){
   addCountryButton();
   addDeleteButtons();
   applyEditableIds();
+  setupDayDateControls();
 }
 
 function setupUi(){
@@ -850,6 +960,13 @@ function setupUi(){
   document.addEventListener("input", e => {
     if(e.target.closest("[contenteditable='true']")) scheduleSave();
   });
+  document.addEventListener("keydown", e => {
+    if(!e.target.closest(".day-date .day-wd,.day-date .day-n,.day-date .day-mo")) return;
+    if(e.key !== "Enter" && e.key !== " ") return;
+    e.preventDefault();
+    e.target.click();
+  });
+  setupDatePicker();
 }
 
 function applyRemoteState(data){
